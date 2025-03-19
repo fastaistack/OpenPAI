@@ -11,6 +11,11 @@
 
 ## Key Highlights
 
+### 📺 **Custom Configuration**
+- 💻 **title**: Web browser title
+- 🏢 **logo**: specify logo 。
+- ☁️ **background**: specify background
+
 ### 🚀 **Seamless Model Integration**
 - **Local Deployment**: Easily connect to local models for on-premise usage.
 - **Enterprise Servers**: Integrate with models deployed on internal corporate servers.
