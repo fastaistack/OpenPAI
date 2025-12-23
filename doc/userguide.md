@@ -75,8 +75,23 @@ After successfully logging in as a Standard user, you can view an overview of th
 
 ### 2.2 Chats
 
-
 ### 2.3 Agent Management
+
+#### 2.3.1 Agent
+
+#### 2.3.2 Worflow
+
+#### 2.3.3 Tool
+
+Tab tool shows user's tool list used in agent or workflow.
+
+![](../doc/images/v1.0/user/tool-list-en.jpg)
+
+User can:
+
+- add tool (BY **API**)
+- delete tool
+- edit tool
 
 ### 2.4 Prompt Management
 
