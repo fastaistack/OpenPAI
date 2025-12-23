@@ -1,0 +1,188 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-rag-predictor-default
+  namespace: default
+  labels:
+    app: llm-rag-predictor-default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-rag-predictor-default
+  template:
+    metadata:
+      labels:
+        app: llm-rag-predictor-default
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      schedulerName: default-scheduler
+      nodeSelector:
+        {{RAG_NODE_SELECTOR_LABEL_NAME}}: {{RAG_NODE_SELECTOR_LABEL_VALUE}}
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: llm-rag-predictor-default-container
+        image: {{RAG_IMAGE}}
+        imagePullPolicy: Always
+        workingDir: /app/ichat
+        command: ["/bin/bash"]
+        args: ["-c", "bash start.sh --port 8080 --gateway-config {{RAG_HOST_PATH}}/bussiness/Param-rag.yaml"]
+        ports:
+        - containerPort: 8080
+          name: http1
+          protocol: TCP
+        - containerPort: 39998
+          name: http8080
+          protocol: TCP
+        - containerPort: 8877
+          name: http8877
+          protocol: TCP
+        - containerPort: 5050
+          name: http5050
+          protocol: TCP
+        - containerPort: 5051
+          name: http5051
+          protocol: TCP
+        - containerPort: 11434
+          name: http11434
+          protocol: TCP
+        env:
+        - name: SENSITIVE_MODEL_PATH
+          value: {{RAG_HOST_PATH}}/bussiness/embedding-models/Security_semantic_filtering
+        - name: pdf_parser_port
+          value: '8877'
+        - name: pdf_parser_device
+          value: {{PDF_PARSER_DEPLOY}}
+        - name: pdf_parser_model_path
+          value: {{RAG_HOST_PATH}}/bussiness/custom-models
+        - name: YOLO_LAYOUT_BASE_BATCH_SIZE
+          value: '1'
+        - name: MFD_BASE_BATCH_SIZE
+          value: '1'
+        - name: MFR_BASE_BATCH_SIZE
+          value: '16'
+        - name: MAX_GPU_CUR_MEM
+          value: '6'
+        - name: VLM_MAX_GPU_CUR_MEM
+          value: '7'
+        - name: BATCH_RATIO
+          value: '2'
+        - name: MINERU_MIN_EPOCH_SIZE
+          value: '200'
+        - name: GATEWAY_CONFIG
+          value: {{RAG_HOST_PATH}}/bussiness/Param-rag.yaml
+        - name: EPAICHAT_SYNC_ENABLE
+          value: 'true'
+        - name: BUSSINESS_PATH
+          value: {{RAG_HOST_PATH}}/bussiness
+        - name: OLLAMA_MODELS
+          value: {{RAG_HOST_PATH}}/bussiness/ollama-cache/models
+        - name: WHISPER_MODEL_PATH
+          value: {{RAG_HOST_PATH}}/bussiness/whisper-models
+        - name: SVC_NAME
+          value: llm-rag-predictor-default
+        - name: SVC_PORT
+          value: '8080'
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: void
+        resources:
+          limits:
+            cpu: {{RAG_LIMITS_CPU}}
+            memory: {{RAG_LIMITS_MEMORY}}
+            nvidia.com/gpu: 1
+          requests:
+            cpu: {{RAG_LIMITS_CPU}}
+            memory: {{RAG_LIMITS_MEMORY}}
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: shared-mem
+        - mountPath: {{RAG_HOST_PATH}}/bussiness
+          name: storage-volume
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "Starting postStart epaichat main service..."
+                cd /app/ichat
+                nohup python3 epaichat/main.py > /tmp/epaichat_main.log 2>&1 &
+                echo "PostStart epaichat main service initiated"
+          preStop:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "Starting preStop cleanup..."
+                cd /app/ichat
+                python3 epaichat/cleanup.py
+                echo "PreStop cleanup completed"
+        livenessProbe:
+          httpGet:
+            path: /inner/probe
+            port: 8080
+          failureThreshold: 3
+          initialDelaySeconds: 1200
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 180
+        readinessProbe:
+          httpGet:
+            path: /inner/probe
+            port: 8080
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 180
+      volumes:
+      - name: shared-mem
+        emptyDir:
+          medium: Memory
+          sizeLimit: 20Gi
+      - name: storage-volume
+        hostPath:
+          path: {{RAG_HOST_PATH}}/bussiness
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-rag-predictor-default
+  namespace: default
+  labels:
+    app: llm-rag-predictor-default
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-rag-predictor-default
+  ports:
+  - name: http1
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: http8080
+    port: 39998
+    targetPort: 39998
+    protocol: TCP
+  - name: http8877
+    port: 8877
+    targetPort: 8877
+    protocol: TCP
+  - name: http5050
+    port: 5050
+    targetPort: 5050
+    protocol: TCP
+  - name: http5051
+    port: 5051
+    targetPort: 5051
+    protocol: TCP
+  - name: http11434
+    port: 11434
+    targetPort: 11434
+    protocol: TCP
