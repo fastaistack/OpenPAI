@@ -5,9 +5,6 @@
 
 🎉 **OpenPAI**  is a lightweight large-model application development platform that can be quickly deployed. It supports local, enterprise server, and public cloud model services, aiming to help users interact with LLMs via a visual web interface and rapidly build LLM-based applications.
 
->  <font color='red' size=20>todo 替换图片</font>
-![](doc/images/v1.0/1.png)
-
 ---
 
 ## Key Highlights
@@ -81,11 +78,11 @@ docker run -d --rm \
 Once running, you can open a web browser and navigate to `http://<HOST-IP>:<HOST_PORT>` to access the OpenPAI login page.
 
 ### 4. Logging In
-Administrator use `admin` to login the system, if login is successful, you will see the OPenPAI homepage.
+Administrator use `admin` to login the system, if login is successful, you will see the OpenPAI homepage.
 Standard user need the administrator to create a new accout for the system, after creating successfully, you can login and use the system.
 
->  <font color='red' size=20>todo 替换图片</font>
-![](doc/images/v1.0/2.png)
+
+![](doc/images/v1.0/login.png)
 
 ---
 
@@ -95,15 +92,15 @@ Standard user need the administrator to create a new accout for the system, afte
 - **Model**: model server, can add model servers, and model services belongs these server.
 - **Resource**: system provides to manage mcp serices.
 - **Applications**:  system provides to manage agents, prompts and app eval tasks
-- **Operational trace**: system will save the user's operational trace for analysis 
+- **Operational Trace**: system will save the user's operational trace for analysis 
 - **Settings**: system manage settings of many business.
 - **Users**: add users, delete users, reset password.
 
 ### Standard User
 - **LLM Conversations**: Chat with integrated large models.
-- **Application manage**: manage agents, prompt, app eval tasks
-- **Data manage**: manage datas like kowledge-bases, databases, professional lexicon
-- **Preference management**: Update personal preference
+- **Application Manage**: manage agents, prompt, eval tasks
+- **Data Manage**: manage datas like kowledge-bases, databases, professional lexicon
+- **Preference Manage**: Update personal preference
 
 ---
 
