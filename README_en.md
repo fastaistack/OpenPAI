@@ -5,6 +5,7 @@
 
 🎉 **OpenPAI**  is a lightweight large-model application development platform that can be quickly deployed. It supports local, enterprise server, and public cloud model services, aiming to help users interact with LLMs via a visual web interface and rapidly build LLM-based applications.
 
+>  <font color='red' size=20>todo 替换图片</font>
 ![](doc/images/v1.0/1.png)
 
 ---
@@ -13,7 +14,7 @@
 
 ### 📺 **Custom Configuration**
 - 💻 **title**: Web browser title
-- 🏢 **logo**: specify logo 。
+- 🏢 **logo**: specify logo
 - ☁️ **background**: specify background
 
 ### 🚀 **Seamless Model Integration**
@@ -26,17 +27,19 @@
 - **Visual Web Interface**: Interact with large models via a friendly UI.
 - **Scalable Architecture**: Supports integration of multiple model providers.
 
-### 🔑 **OpenStation Integration**
-OpenPAI V1.0 relies on the **OpenStation** account system. Before installing OpenPAI, please ensure OpenStation is already installed. Any users created in OpenStation can directly log into OpenPAI without extra registration.
-
 ### 🎯 **Multiple Roles**
-- **Administrator**: Access advanced settings, manage users, model connections, and global parameters.
-- **Standard User**: Engage in LLM conversations, adjust user preferences, and manage personal passwords.
+- **Administrator**: Access advanced settings, manage users, model connections, agents, resourcesand datas.
+- **Standard User**: Engage in LLM conversations, adjust user preferences, and manage personal agents and datas.
 
 ### 🌐 **Connect to Various Model Sources**
 - Integrate with **OpenStation**-deployed model services.
 - Import 3rd-party model endpoints.
 - Refresh or disable certain model connections as needed.
+
+
+### 🛠️**manage agents, datas**
+- 🔧manage agents, eval-tasks, prompts
+- 🖥️manage datas, including knowledge-bases, databases, profession lexicons
 
 ---
 
@@ -78,8 +81,10 @@ docker run -d --rm \
 Once running, you can open a web browser and navigate to `http://<HOST-IP>:<HOST_PORT>` to access the OpenPAI login page.
 
 ### 4. Logging In
-On the login screen, use the **OpenStation** credentials to sign in. If login is successful, you will see the OpenPAI homepage.
+Administrator use `admin` to login the system, if login is successful, you will see the OPenPAI homepage.
+Standard user need the administrator to create a new accout for the system, after creating successfully, you can login and use the system.
 
+>  <font color='red' size=20>todo 替换图片</font>
 ![](doc/images/v1.0/2.png)
 
 ---
@@ -87,12 +92,18 @@ On the login screen, use the **OpenStation** credentials to sign in. If login is
 ## 🎉 Features & Roles
 
 ### Administrator
-- **Settings**: Manage user lists, external connections, model listings, and platform-wide parameters.
-- **Experience LLM Chat**: Test out conversation flows using the integrated models.
+- **Model**: model server, can add model servers, and model services belongs these server.
+- **Resource**: system provides to manage mcp serices.
+- **Applications**:  system provides to manage agents, prompts and app eval tasks
+- **Operational trace**: system will save the user's operational trace for analysis 
+- **Settings**: system manage settings of many business.
+- **Users**: add users, delete users, reset password.
 
 ### Standard User
 - **LLM Conversations**: Chat with integrated large models.
-- **Account Management**: Update personal info and passwords.
+- **Application manage**: manage agents, prompt, app eval tasks
+- **Data manage**: manage datas like kowledge-bases, databases, professional lexicon
+- **Preference management**: Update personal preference
 
 ---
 
@@ -102,7 +113,6 @@ For usage details (model configuration, plugin usage, or advanced features), ple
 ---
 
 ## 🔮 Future Plans
-- **Account Management**: Independent account management.
 - **Expanded Model Library**: Integration with more model providers.
 - **Additional Plugins**: e.g., knowledge base enhancements, external search.
 - **Refined Admin Controls**: More granular user and model access management.
