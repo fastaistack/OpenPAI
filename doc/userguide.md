@@ -75,6 +75,65 @@ After successfully logging in as a Standard user, you can view an overview of th
 
 ### 2.2 Chats
 
+ **「Chats」** module user can experience interaction between large models, intelligent agents, and databases. Users can choose to have conversations with large models, intelligent agents, databases, and manage conversation information.
+
+![](../doc/images/v1.0/user/chat_en.png)
+
+#### 2.1.1 New Chat
+
+Click **「New Chat」**, the system will open a new chat window. Users can:
+- Quickly enter chat mode
+
+Open the page for creating a new chat, where users can see the object you want to interact with, such as a model, intelligent agent, or a database. If there is no intelligent agent, you can create one under the Agent module; If no database has been selected or created, database information can be created in advance under the Database module.
+
+- Browse basic information of interactive objects
+
+For different interaction objects, different information is displayed. If conversing with a large model, the model information is displayed and the model parameters can be modified; If conversing with an intelligent agent, display the agent's information; Similar database chat, displaying database connection information for users to choose from.
+
+![](../doc/images/v1.0/user/chat_agent_en.png)
+
+
+![](../doc/images/v1.0/user/chat_db_en.png)
+
+
+- Diversified chat and interaction to obtain results
+
+Users can send questions and wait for the system to reply, and the reply content will be streamed out. The system supports uploading files, audio, and images in multiple formats and reply answers for them.
+
+![](../doc/images/v1.0/user/chat_multi_en.png)
+
+- Set interaction details to achieve precise and customized interactions
+
+Users can change model parameters and select tools (such as sensitive filter, web search, knowledge base, MCP , etc.) for more detailed and accurate responses.
+
+![](../doc/images/v1.0/user/chat_tool_en.png)
+
+
+#### 2.1.2 chat management
+
+- The system supports operations such as adding, deleting, modifying, and querying chat, changing names, and deleting chat
+- Copy chat, for a certain chat, you can copy a new chat that contains all the configuration information of the current chat, without including the interaction history
+- Export chat records. For chat interaction history, it can be exported as a markdown format file to the local device
+
+
+![](../doc/images/v1.0/user/chat_manage_en.png)
+
+#### 2.1.3 chat content management
+
+- Copy content: Users can quickly copy questions or answers
+- Reference content: You can reference the previous content and continue to chat
+- Regenerate the chat, users can regenerate the question of any chat
+- Delete question-answer pairs: Users can delete multiple question-answer pairs and no longer display them
+- Collection: Collect question-answer to Knowledge Base Module
+- User evaluation answer quality: Support users to evaluate the answer results, like or dislike them
+
+![](../doc/images/v1.0/user/chat_content_manage1_cn.png)
+
+
+![](../doc/images/v1.0/user/chat_content_manage_en.png)
+
+
+
 
 ### 2.3 Agent Management
 
