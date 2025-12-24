@@ -19,9 +19,15 @@ After successful login, the **OpenPAI** homepage is displayed. Administrators ca
 
 ### 1.2 Model Service
 
-#### 1.2.1 Model Provider
+On the homepage, you can click the **`Model Service`** submenu under **「Model Service」** to enter the model service management module.
 
-#### 1.2.2 Model Service
+Administrators can introduce their own service providers by clicking "Add Model Service Provider". The model addition feature includes multiple built-in templates. Users can select a template and fill in the API-KEY for quick addition, or manually enter the service provider name, API-KEY, and service URL.
+
+![](../doc/images/v1.0/admin/modelprovideradd.png)
+
+If the URL is accessible and supports obtaining the model list via the OpenAI protocol, the corresponding model services will be automatically added to the platform during the addition process; if not, the corresponding model service list will be empty. If the URL does not support obtaining the model list, users can manually add model services under the corresponding model service provider using the add function, which requires filling in the correct model name and URL.
+
+Administrators can modify the parameters of added model service providers through the settings function. After saving, the system will re-obtain the model service list via the URL. Users can also delete the corresponding model service providers through the settings > remove function. The service synchronization function is used to obtain the latest model service list from the service provider. If a model service saved on the platform is not in the service provider's new model service list, it will be removed from the platform's list; if there are new model services in the service provider's new list, they will be added to the platform. After a model is added to the platform, administrators can configure its sharing scope through the sharing function, setting it to be visible to all users or only to specific users. When set to be visible to specific users, only those within the sharing scope can use the corresponding model for conversations.
 
 ### 1.3 MCP
 
@@ -42,6 +48,14 @@ After successful login, the **OpenPAI** homepage is displayed. Administrators ca
 #### 1.5.1 KBase
 
 #### 1.5.2 DataBase
+
+Administrators can access the database connection management page through the database module. The database connection management interface displays a list of database connections created by users, showing details including connection name, database type, database name, server address, port, number of tables, creator, sharing scope, and connection time. Users can filter database connections by connection type, connection name, and creator.
+
+When the number of tables in a user's database changes, administrators can use the refresh function to update the table count for the corresponding database connection. Administrators can share database connections with other users, specifying either all users or specific users/groups. Shared connections will be visible and available for database conversations in the connection list of the target users or groups.
+
+The transfer function allows administrators to transfer a specified database connection to another user. The target user list during transfer displays all users in the system. After the transfer, the creator of the database connection will be updated to the new user.
+
+![](../doc/images/v1.0/admin/database.png)
 
 #### 1.5.3 Professional Lexicon
 
@@ -167,6 +181,20 @@ User can:
 ### 2.6 KBase Management
 
 ### 2.7 Database Management
+
+The database connection management interface allows users to view the list of database connections created by themselves or shared by others. The list displays details including connection name, database type, database name, server address, port, creator, sharing scope, and connection time. Users can filter database connections by the criteria of Only Me, connection type, connection name, and creator.
+
+![](../doc/images/v1.0/user/databaselist.png)
+
+Users can add a database connection via the **Create Database Connection** function. They need to select the database type (supported types include MySQL, PostgreSQL, MariaDB, SQL Server, Oracle, and Dameng), and fill in the connection name, server address, port, username, password, and database name. After confirmation, the system will perform a connection test using the selected database type and the entered server address, port, username, password, and database name. If the database connection fails, the creation will be aborted; if the connection succeeds, the creation will be completed. Once created, the platform will automatically retrieve the table information of the database. Users can view the newly created database connection by refreshing the list.
+
+![](../doc/images/v1.0/user/databasecreate.png)
+
+When the number of tables in a user's database changes, the user can use the refresh function to update the table count for the corresponding database connection. The creator of a database connection can share the connection with other users, and can specify to share it with all users or specific users. For specific users, the connection can be shared with designated users or user groups. The shared users can view the connection in their connection list and use it for database conversations. The transfer function is used to transfer a specified database connection to another user. During the transfer, the target user list displays all users. After the transfer, the creator of the database connection will be updated to the new user.
+
+The data in the AI Learning Respositiry is used to provide prompts for large models during conversations, which can improve the accuracy of the models' responses. Users can view the learning respositiry data corresponding to the database and add their own learning data through the add function.
+
+AI Learning The data in the AI Learning Respositiry data is divided into three types: SQL QS, Terminology, DDL .SQL QS includes question descriptions and their corresponding SQL answers.Terminology refers to descriptive language that characterizes the database, where users can fill in information related to the database structure, usage scenarios, and more.DDL  consists of SQL statements for creating or modifying data tables in the database. When a database is added, the system automatically reads the table creation statements in the database and adds them to the learning library. Users can  delete, or add to this part of the data.
 
 ### 2.8 Professional Lexicon Management
 
