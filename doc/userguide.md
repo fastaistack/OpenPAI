@@ -43,6 +43,14 @@ Administrators can modify the parameters of added model service providers throug
 
 #### 1.4.4 App Eval
 
+On the homepage, click the **"Applications"** submenu under the "Application Evaluation" sub-menu to access the Application Evaluation Management module. The information displayed in the task list includes: task name, creator, type, evaluation object, evaluation set (only for dialogue tasks and manual evaluation tasks, no evaluation set is shown as "--"; for batch evaluation tasks, the evaluation set name is displayed), number of evaluation questions (shown as the number of questions asked), status, and actions.
+- Only dialogue task: No task status, displayed as "--"; Task operation: Deletion is allowed.
+- Manual Evaluation Tasks: New tasks can be deleted; tasks in progress can be deleted; manually scored tasks can be deleted; completed tasks can be deleted.
+- Batch Evaluation Tasks: In queue, can be pinned, moved to bottom, or deleted; in progress, can be paused/resumed or deleted; manual scoring, can be deleted; assisted scoring, can be paused/resumed or deleted; paused, can be deleted; already paused, can be resumed or deleted; completed, can be deleted.
+The status of the batch evaluation task is: "In Progress" and "Auxiliary Scoring." The number of tasks is controlled by the maximum number of running batch evaluation tasks set in the administrator system settings page (note: "running" refers to tasks in "In Progress" and "Auxiliary Scoring" states).
+The task status has been automatically switched to manual scoring upon completion of batch generation. It needs to be removed from task concurrency and can consume queued tasks to increase task concurrency.
+The status of the platform's batch evaluation tasks is: "Generating and assisting scoring," with the number of tasks reaching the maximum limit for running batch evaluation tasks. When a regular user creates a batch evaluation task, it enters the queue. If the number of queued tasks for a single user reaches the limit set by the administrator in the system settings page, new batch evaluation tasks are prohibited, and a message is displayed: "Batch evaluation tasks have reached the maximum queued task limit.".
+
 ### 1.5 Data
 
 #### 1.5.1 KBase
@@ -83,8 +91,8 @@ Page configuration primarily involves flexible configuration of the system to me
 ![](../doc/images/v1.0/admin/web_config_en.png)
 
 #### 1.6.3 User Management
-
-
+On the homepage, you can click the **"Application"** menu and select the `User Management` submenu to access the user management module. The information displayed in the user list includes: username, role, description, creation time, and actions (password reset and deletion).
+The administrator can create new users. The default password for the administrator is admin@123, and the default password for regular users is 123456a?
 ---
 
 ## 2. Standard User Functions
@@ -177,6 +185,40 @@ User can:
 ### 2.4 Prompt Management
 
 ### 2.5 App Eval Management
+
+On the homepage, you can click on the 'Application Review' submenu under 'Applications' to enter the application review module.
+
+#### 2.5.1. Evaluation set management
+The evaluation set management page allows users to view the evaluation set list, preview questions, download templates, upload files, modify, delete, and share information.
+
+#### 2.5.2. Evaluation task
+There are three types of evaluation tasks: dialogue only, manual evaluation, and batch evaluation.
+- Only dialogue tasks are supported, and only multi-mode dialogues are supported.
+- The manual evaluation task supports both multi-modal dialogue and manual scoring.
+- Batch evaluation task, generate answers in batches based on the selected evaluation set of questions. Default support for manual scoring, optional auxiliary scoring; The number of answer generation options is [1,4] times, with a default of 1 time; Select an available review set and enter the number of questions (the maximum number of questions is controlled by the number of questions per task on the administrator system settings page).
+
+The evaluation objects are divided into three categories: selecting models, selecting intelligent agents, and accessing services. The number of evaluation objects is limited to [1,4].
+- Select Model
+Required model and configure model parameters;
+Required object name, defaults to model name, and supports modification;
+Optional tools and configure tool parameters.
+
+- Select intelligent agent
+Required intelligent agent;
+Required object name, default to intelligent agent name, and supports modification;
+Required API KEY.
+
+- Access service
+Required service address that supports openai format output;
+Required object name (no default value);
+Required API name;
+Select api_key and configure the parameter information supported by the service;
+Required model name (corresponding to the model parameter of the service).
+
+Task list display: task name, task type, evaluation object, evaluation set (only dialogue tasks and manual evaluation tasks, no evaluation set, displayed as "--"; batch evaluation tasks, displayed as evaluation set name), number of questions (displayed as the number of questions asked), task status and task operation (specific status and operation will be detailed in the task types below).
+- Task status: No task status, displayed as "--"; Task operations: including evaluation reports, copying, and deleting.
+- Task status and task operation: create a new task, can be copied or deleted; Generating, replicable and deletable; Manual scoring, can be copied or deleted; Completed, review report can be viewed, copied or deleted.
+- Task status and task operations: queued, can be copied or deleted; During generation, it can be paused, continued, copied, or deleted; Manual scoring, can be copied or deleted; Auxiliary scoring, can be paused, continued, copied, or deleted; Paused, can be copied or deleted; Paused, can be copied, can continue, can be deleted; Completed, review report can be viewed, copied or deleted.
 
 ### 2.6 KBase Management
 
