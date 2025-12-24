@@ -1,75 +1,75 @@
 #####################1、根据部署方式修改#####################
-# EPAI-CHAT 更改
-EPAI_ENABLE_VISION_MODEL: false                                                # ——> CPU部署方式下，该值为false,GPU部署方式下，该值为true
+# OPENPAI-CHAT 更改
+OPENPAI_ENABLE_VISION_MODEL: false                                                # ——> CPU部署方式下，该值为false,GPU部署方式下，该值为true
 
-# EPAI-PARSER 更改
-EPAI_PARSER_REPLICAS: 1                                                        # ——> parser生成pod数量，cpu部署为1 ，gpu部署为2
-EPAI_PARSER_LIMITS_CPU: "26"                                                   # ——> parser所需CPU资源,如果不使用GPU解析,请调大此数值,建议改为26,cpu部署建议为"26",gpu部署建议为"4"
-EPAI_PARSER_EPOCH_SIZE: 10                                                     # ——> parser新增环境变量，CPU部署方式下，该值为10, GPU部署方式下，该值为200。每次调用api解析，一次性处理多少pdf页；cpu部署时必须设置小一点，否则调用pdf解析服务会超时
+# OPENPAI-PARSER 更改
+OPENPAI_PARSER_REPLICAS: 1                                                        # ——> parser生成pod数量，cpu部署为1 ，gpu部署为2
+OPENPAI_PARSER_LIMITS_CPU: "26"                                                   # ——> parser所需CPU资源,如果不使用GPU解析,请调大此数值,建议改为26,cpu部署建议为"26",gpu部署建议为"4"
+OPENPAI_PARSER_EPOCH_SIZE: 10                                                     # ——> parser新增环境变量，CPU部署方式下，该值为10, GPU部署方式下，该值为200。每次调用api解析，一次性处理多少pdf页；cpu部署时必须设置小一点，否则调用pdf解析服务会超时
 
 
 #####################2、根据实际环境修改#####################
 # {{HOST_IP}}和{{HOST_PATH}}为脚本传入的变量
 
-epai_ui_port: 32018                                                            # UI界面登录端口
+openpai_ui_port: 32018                                                            # UI界面登录端口
 
 
 # 总体更改
-ALL_EPAI_HOST_IP: {{HOST_IP}}                                                 # ——> 主机（Host）IP地址
-# ALL_EPAI_IMAGE_HUB: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/      # ——> 镜像仓库地址
+ALL_OPENPAI_HOST_IP: {{HOST_IP}}                                                 # ——> 主机（Host）IP地址
+# ALL_OPENPAI_IMAGE_HUB: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/      # ——> 镜像仓库地址
 
 # UI界面的IP
-EPAI_UI_NODEIP: {{HOST_IP}}
+OPENPAI_UI_NODEIP: {{HOST_IP}}
 
 # 时区 更改
-EPAI_TIMEZONE: Asia/Shanghai
+OPENPAI_TIMEZONE: Asia/Shanghai
 
-# EPAI-UI更改 
-EPAI_UI_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epai-ui:latest                # ——> epaiui基础镜像
-
-
-# EPAI-CHAT 更改
-EPAI_CHAT_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epaichat:v1.0                # ——> chat基础镜像
-EPAI_CHAT_API_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1           # ——> APIServer基础镜像
-EPAI_CHAT_API_DOMAIN: inais.cluster                                            # ——> APIServer的Domain，请根据实际情况修改
-EPAI_CHAT_API_CPU: 1                                                           # ——> APIServer所需要的cpu的大小
-EPAI_CHAT_API_MEMORY: 6Gi                                                      # ——> APIServer所需要的内存的大小
-EPAI_CHAT_DB_HOST: {{HOST_IP}}:3306                                            # ——> chat数据库 IP:端口
-EPAI_CHAT_DB_PASSWORD: Chat2024                                                # ——> chat数据库密码
-EPAI_CHAT_DB_USER: epaiadmin                                                   # ——> chat数据库用户
-EPAI_CHAT_MACHINE_CODE: ce:26:e0:c1:5d:d2                                      # ——> 主机（Host）MAC地址
-EPAI_CHAT_PV_HOST_PATH: "{{HOST_PATH}}/cache"                                  # ——> chat的PV需要映射的主机路径： {HOST_PATH}/cache，如无需手动创建
-EPAI_AGENT_PORTS_START: 46001                                                  # ——> 智能体开放起始端口
-EPAI_AGENT_HOSTS: "{{HOST_IP}}"                                                # ——> 智能体内外网IP配置，目前暂用masterIP，后面可根据需要修改
-EPAI_CHAT_AGENTUI_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/agent-ui:latest        # ——> 智能体UI镜像
-EPAI_CHAT_BUSYBOX_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/busybox:1.31.0         # ——> busybox镜像
+# OPENPAI-UI更改 
+OPENPAI_UI_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-ui:latest                # ——> OPENPAIui基础镜像
 
 
-# EPAI-MCP 更改
-EPAI_MCP_PV_STORAGE: 30Gi                                                      # ——> EPAI-MCP指定的PV存储的容量大小
-EPAI_MCP_PV_HOST_PATH: "{{HOST_PATH}}/mcp_data"                                 # ——> EPAI-MCP的PV需要映射的主机路径： {HOST_PATH}/mcpdata01，如无需手动创建
+# OPENPAI-CHAT 更改
+OPENPAI_CHAT_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaichat:v1.0                # ——> chat基础镜像
+OPENPAI_CHAT_API_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1           # ——> APIServer基础镜像
+OPENPAI_CHAT_API_DOMAIN: inais.cluster                                            # ——> APIServer的Domain，请根据实际情况修改
+OPENPAI_CHAT_API_CPU: 1                                                           # ——> APIServer所需要的cpu的大小
+OPENPAI_CHAT_API_MEMORY: 6Gi                                                      # ——> APIServer所需要的内存的大小
+OPENPAI_CHAT_DB_HOST: {{HOST_IP}}:3306                                            # ——> chat数据库 IP:端口
+OPENPAI_CHAT_DB_PASSWORD: Chat2024                                                # ——> chat数据库密码
+OPENPAI_CHAT_DB_USER: oepnpaiadmin                                                   # ——> chat数据库用户
+OPENPAI_CHAT_MACHINE_CODE: ce:26:e0:c1:5d:d2                                      # ——> 主机（Host）MAC地址
+OPENPAI_CHAT_PV_HOST_PATH: "{{HOST_PATH}}/cache"                                  # ——> chat的PV需要映射的主机路径： {HOST_PATH}/cache，如无需手动创建
+OPENPAI_AGENT_PORTS_START: 46001                                                  # ——> 智能体开放起始端口
+OPENPAI_AGENT_HOSTS: "{{HOST_IP}}"                                                # ——> 智能体内外网IP配置，目前暂用masterIP，后面可根据需要修改
+OPENPAI_CHAT_AGENTUI_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/agent-ui:latest        # ——> 智能体UI镜像
+OPENPAI_CHAT_BUSYBOX_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/busybox:1.31.0         # ——> busybox镜像
+
+
+# OPENPAI-MCP 更改
+OPENPAI_MCP_PV_STORAGE: 30Gi                                                      # ——> OPENPAI-MCP指定的PV存储的容量大小
+OPENPAI_MCP_PV_HOST_PATH: "{{HOST_PATH}}/mcp_data"                                 # ——> OPENPAI-MCP的PV需要映射的主机路径： {HOST_PATH}/mcpdata01，如无需手动创建
 
 
 
-# EPAI-PARSER 更改
-EPAI_PARSER_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epaiparser:v1.0              # ——> parser基础镜像
-EPAI_PARSER_NODE_SELECTOR: 1                                                   # ——> parser指定的部署节点,inf_use: 1，部署在推理节点
+# OPENPAI-PARSER 更改
+OPENPAI_PARSER_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaiparser:v1.0              # ——> parser基础镜像
+OPENPAI_PARSER_NODE_SELECTOR: 1                                                   # ——> parser指定的部署节点,inf_use: 1，部署在推理节点
 
 
-# EPAI-ES 更改
-EPAI_ES_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/docker.elastic.co/elasticsearch/elasticsearch:8.11.3     # ——> EPAI-ES基础镜像
-EPAI_ES_PV_STORAGE: 50Gi                                                       # ——> EPAI-ES指定的PV存储的容量大小
-EPAI_ES_PV_HOST_PATH: "{{HOST_PATH}}/es_data"                                   # ——> EPAI-ES的PV需要映射的主机路径： {HOST_PATH}/esdata01，如无需手动创建
+# OPENPAI-ES 更改
+OPENPAI_ES_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/docker.elastic.co/elasticsearch/elasticsearch:8.11.3     # ——> OPENPAI-ES基础镜像
+OPENPAI_ES_PV_STORAGE: 50Gi                                                       # ——> OPENPAI-ES指定的PV存储的容量大小
+OPENPAI_ES_PV_HOST_PATH: "{{HOST_PATH}}/es_data"                                   # ——> OPENPAI-ES的PV需要映射的主机路径： {HOST_PATH}/esdata01，如无需手动创建
 
 
-# EPAI-REDIS 更改
-EPAI_REDIS_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/redis:7.2.4                  # ——> EPAI-REDIS基础镜像
-EPAI_REDIS_PV_HOST_PATH: "{{HOST_PATH}}/redis_data"                            # ——> EPAI-REDIS的PV需要映射的主机路径：{HOST_PATH}/redis_data，如无需手动创建，并给与777权限，例如：chmod -R 777 {HOST_PATH}/redis_data
+# OPENPAI-REDIS 更改
+OPENPAI_REDIS_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/redis:7.2.4                  # ——> OPENPAI-REDIS基础镜像
+OPENPAI_REDIS_PV_HOST_PATH: "{{HOST_PATH}}/redis_data"                            # ——> OPENPAI-REDIS的PV需要映射的主机路径：{HOST_PATH}/redis_data，如无需手动创建，并给与777权限，例如：chmod -R 777 {HOST_PATH}/redis_data
 
 
-# EPAI-MINIO 更改
-EPAI_MINIO_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/quay.io/minio/minio:RELEASE.2023-12-20T01-00-02Z      # ——> EPAI-MINIO基础镜像
-EPAI_MINIO_PV_STORAGE: 10Gi                                                    # ——> EPAI-MINIO指定的PV存储的容量大小
-EPAI_MINIO_PV_HOST_PATH: "{{HOST_PATH}}/minio_data"                            # ——> EPAI-MINIO的PV需要映射的主机路径： {HOST_PATH}/minio_data，如无需手动创建
+# OPENPAI-MINIO 更改
+OPENPAI_MINIO_IMAGE: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/quay.io/minio/minio:RELEASE.2023-12-20T01-00-02Z      # ——> OPENPAI-MINIO基础镜像
+OPENPAI_MINIO_PV_STORAGE: 10Gi                                                    # ——> OPENPAI-MINIO指定的PV存储的容量大小
+OPENPAI_MINIO_PV_HOST_PATH: "{{HOST_PATH}}/minio_data"                            # ——> OPENPAI-MINIO的PV需要映射的主机路径： {HOST_PATH}/minio_data，如无需手动创建
 
 

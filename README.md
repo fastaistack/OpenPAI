@@ -67,10 +67,10 @@ docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<I
 chat需要拉取如下9个镜像：
 
 ```
-epaichat:v1.0
+openpaichat:v1.0
 apiserver:v1.1
-epaiparser:v1.0
-epai-ui:latest
+openpaiparser:v1.0
+openpai-ui:latest
 agent-ui:latest
 redis:7.2.4
 quay.io/minio/minio:RELEASE.2023-12-20T01-00-02Z
@@ -84,7 +84,7 @@ LLM-Serving需要拉取如下1个镜像：
 llm-serving:8.0
 ```
 
-拉取完成后，如果机器有多个节点，需要在**每个节点**拉取apiserver、agentui和epaiparser的镜像，例如，除了主节点外还有一个node2节点：
+拉取完成后，如果机器有多个节点，需要在**每个节点**拉取apiserver、agentui和openpaiparser的镜像，例如，除了主节点外还有一个node2节点：
 
 ```shell
 ssh node2
@@ -96,7 +96,7 @@ docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<I
 ```shell
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/agent-ui:latest
-docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epaiparser:v1.0
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaiparser:v1.0
 ```
 
 
