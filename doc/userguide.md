@@ -201,47 +201,60 @@ On the knowledge base list page or knowledge base card page, click the [Edit] bu
 
 ##### 2.6.2.5 Knowledge Base Configuration
 
-Click on a knowledge base to enter the knowledge base details page.
+Click on Knowledge Base to enter the Knowledge Base details page.
 
-Document knowledge bases have 2 tabs: File Management and Configuration;
+The Document Knowledge Base has two tabs: File Management and Setting;
 
-Question-answer knowledge bases have 3 tabs: File Management, Question List, and Configuration;
+The Question and Answer Knowledge Base has three tabs: File Management, Question List, and Setting;
 
-Click the Configuration tab to edit the parsing, chunking, indexing, and retrieval settings of the knowledge base.
+Clicking the Configuration tab allows you to edit the knowledge base's configuration of analysis, chunking, storage, and search.
 
-(1) Knowledge Base Parsing Configuration
+ (1) Analysis Configuration
 
-Language Detection: Enable this button to have the backend verify whether the language of the parsed document matches the knowledge base language configuration. If they do not match, parsing will fail and an error message will be displayed. When disabled, the backend no longer checks the document language and directly processes it using the language set in the knowledge base. Note that when parsing PDF files, this configuration only takes effect when the "Accuracy-First Strategy" is selected. When "Speed-First Strategy" or "Vision Language Model" is selected, this configuration has no effect.
+**Language Detect**: Enabling this button will cause the backend to check if the language of the parsed document matches the knowledge base's language configuration; if they do not match, parsing will fail and an error message will be displayed; when disabled, the backend will no longer check the language of the parsed document and will directly use the language-setting of the knowledge base for processing. It should be noted that this configuration only takes effect when the "**Precision Priority**" is selected during PDF file parsing. This configuration has no effect when "Speed Priority" or "VLM(Visual Language Model)" is selected.
 
-Parsing Strategy: PDF file parsing offers three parsing strategies: "Accuracy-First Strategy", "Speed-First Strategy", and "Vision Language Model". Only one strategy can be selected at a time, with the default being "Accuracy-First Strategy". Additionally, this configuration can be modified even after PDF parsing is complete.
+**Parsing Strategy**: PDF file parsing offers three strategies: "**Accuracy Priority**," "**Speed Priority**," and "**VLM**." Only one strategy can be selected during parsing; the default is "Accuracy Priority Strategy." This configuration can be modified after PDF parsing.
 
-- 1) When "Accuracy-First Strategy" is selected, the backend invokes pipeline components such as layout detection, formula recognition detection, table recognition, and character recognition for PDF parsing. This offers high accuracy and strong generalizability, with faster parsing speed when GPU is deployed. When this configuration is selected, there are two optional sub-configuration items: "Scanned Document" and "Formula Recognition".
-Enable the "Scanned Document" button to use OCR models for character recognition. This is recommended for scanned PDF documents. When disabled, the backend automatically determines whether the PDF is scanned. If it is not scanned, Python libraries are used to directly extract text from the PDF, resulting in faster parsing speed. However, automatic detection of scanned PDFs has some error margin. If you are certain the PDF is scanned, it is recommended to enable this button directly. This is disabled by default.
-Enable the "Formula Recognition" button to have the backend invoke formula detection models to detect whether the PDF contains formulas. For PDFs with formulas or when uncertain, it is recommended to enable this button. If you are certain the PDF contains no formulas, you can disable this configuration to improve parsing speed. This is enabled by default.
+1) When "Accuracy Priority" is selected, the background uses a pipeline of components such as layout detection, formula recognition and detection, table recognition, and text recognition for PDF parsing. This results in high accuracy, strong versatility, and faster parsing speed when deployed on GPUs. When this configuration is selected, there are two sub-configuration options: "Photocopies" and "Formula Recognition."
 
-- 2) When "Speed-First Strategy" is selected, the backend uses smaller-scale layout detection and character recognition models for parsing. Accuracy is slightly lower, but parsing speed is faster when CPU is deployed. When this configuration is selected, there is one optional sub-configuration item: "Scanned Document".
-Enable the "Scanned Document" button to use OCR models for character recognition. This is recommended for scanned PDF documents. When disabled, the backend uses Python libraries to directly extract text from the PDF, resulting in faster parsing speed. If you are certain the PDF is scanned, it is recommended to enable this button directly. This is disabled by default.
+   
 
-- 3) When "Vision Language Model" is selected, the backend uses vision language models for PDF parsing, offering higher parsing accuracy and the ability to handle PDFs with complex formatting and multiple mixed languages (Chinese, English, Japanese, Korean). However, this requires more resources and parsing speed is slightly slower. It is recommended for use when GPU is deployed.
+- Enabling the "Photocopies" button uses an OCR model for text recognition in the background. It is recommended to select this configuration for photocopy PDFs. The backend automatically determines whether the PDF document is a photocopy when Disabling the "Photocopies". If it is not a photocopy, it uses Python library functions to directly extract text from the PDF, resulting in faster parsing. However, automatically determining whether a PDF document is a photocopy is not 100% accurate. If you are certain it is a photocopy, it is recommended to directly select this button. This configuration is disabled by default.
+- Enabling the "Formula Recognition" button will cause the background to call a formula detection model to check if there are formulas in the PDF file. For PDF files with formulas, or if you are unsure whether there are formulas, it is recommended to select this button. If you are certain there are no formulas in the PDF, disable this configuration option, which will improve parsing speed. This configuration is enabled by default.
 
-Image Understanding: Enable this configuration to use AI models for precise understanding of image content. This step will consume more processing time.
 
-(2) Knowledge Base Chunking Configuration
 
-Chunking strategies include universal chunking and hierarchical chunking, with universal chunking as the default.
+2) When selecting the "Speed Priority," the background calls smaller-scale layout detection and text recognition models for parsing, resulting in slightly lower accuracy, but faster parsing speed when deployed on CPU. When this configuration is selected, there is a selectable sub-configuration option: "Photocopies."
 
-- Universal Chunking: The system splits content into independent chunks according to user-defined rules. When Q&A retrieval matches a certain chunk, the content of that chunk is directly returned as context.
+- Enabling the "Photocopies" button uses an OCR model for text recognition in the background. It's recommended to select this configuration for photocopied PDFs. Disabling the "Photocopies" button allows the background to directly extract text from the PDF using Python library functions, resulting in faster parsing. If you are certain it's a photocopy PDF, it's recommended to select this button directly. This configuration is disabled by default.
+
+
+
+3) Selecting "VLM(Visual Language Model)" uses a visual language model for PDF parsing, resulting in higher parsing accuracy and handling PDFs with complex formats and multiple languages (Chinese, English, Japanese, Korean). However, it requires more resources and is slightly slower; it's recommended for GPU deployments.
+
+**Image Comprehension**: Enabling this configuration uses an AI model to accurately understand image content, which takes more time.
+
+
+
+ (2) Chunking Configuration
+
+Chewing strategies include **general chunk** and **multi-level chunk**. General chunk is used by default.
+
+**General Chunk**: The system splits the content into independent chunks according to user-defined rules. When the system retrieves a chunk for question-answering, the content of the chunk will be returned as the context.
 
 This configuration has only one parameter:
 
-    - Chunk Size: The token count limit for each chunk after splitting long text into multiple chunks. Valid range: 0-1000, default: 128.
+**Chunk Size**: The limit on the number of chunk tokens after splitting a long text into multiple chunks; the value range is 0-1000, with a default of 128.
 
-- Hierarchical Chunking: Hierarchical chunking uses a two-tier chunk structure to balance retrieval accuracy and completeness of context information. Q&A retrieval uses second-tier chunks, but returns first-tier chunk content, providing rich context information.
 
-This configuration has 2 parameters:
 
-    - Second-Tier Chunk Size: Splits the document according to the set number of chunk tokens while ensuring semantic completeness. Valid range: 0-1000, default: 128.
-    - First-Tier Chunk Size: Character count limit for first-tier chunks. Each first-tier chunk contains multiple second-tier chunks. Q&A retrieval uses second-tier chunks but returns the content of their containing first-tier chunk. Valid range: 512-4096, default: 1024.
+**Multi-level Chunk**: The multi-level chunk uses a two-tier data structure to balance the search accuracy and context information. When answering questions, the system retrieves the second-level chunk, but the first-level content will be returned, which can provide richer context.
+
+This configuration has two parameters:
+
+**Second-level chunk size**: The limit on the number of second-level chunk tokens after splitting a long text into multiple chunks; Its value range is 0-1000, with a default of 128.
+
+**First-level chunk size**: The limit for the first-level-chunk tokens. Each first-level chunk contains multiple second-level chunk; The second-level chunk is used in searching , but the first-level chunk  will be returned for question answering; Its value range 512-4096, default 1024.
 
 (3) Knowledge Base Indexing Configuration
 
