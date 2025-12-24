@@ -30,6 +30,34 @@ If the URL is accessible and supports obtaining the model list via the OpenAI pr
 Administrators can modify the parameters of added model service providers through the settings function. After saving, the system will re-obtain the model service list via the URL. Users can also delete the corresponding model service providers through the settings > remove function. The service synchronization function is used to obtain the latest model service list from the service provider. If a model service saved on the platform is not in the service provider's new model service list, it will be removed from the platform's list; if there are new model services in the service provider's new list, they will be added to the platform. After a model is added to the platform, administrators can configure its sharing scope through the sharing function, setting it to be visible to all users or only to specific users. When set to be visible to specific users, only those within the sharing scope can use the corresponding model for conversations.
 
 ### 1.3 MCP
+On the homepage, you can click the `MCP` submenu under **「MCP」** to enter the MCP management module. The MCP module is divided into two parts: `MCP Manager` and `MCP Resource`, corresponding to the lifecycle management of MCP severs and resource recommendations, site navigation, and other functions.
+
+#### 1.3.1 MCP Manager
+The MCP Manager module includes operations such as Create, Check, Edit, Start/Stop, and Delete. Administrators can use this module to maintain and manage all MCP servers provided to users.
+![](../doc/images/v1.0/admin/mcp_list_en.png)
+
+Click "Create" to add a MCP server, filling in the parameters of the MCP, or pasting JSON configuration for one-click entry.
+![](../doc/images/v1.0/admin/mcp_add_en.png)
+Click "Confirm", and the system will automatically validate the parameters and attempt to initialize the MCP server. After successful initialization, the server status will display as "Normal" and the tool list will be automatically retrieved; if it fails, you can modify the parameters and resubmit.
+
+Click the "Check" button to view the basic configuration information of the MCP server, including server name, server description, keywords, and tool list.
+![](../doc/images/v1.0/admin/mcp_detail_en.png)
+
+Click the "Stop" or "Start" button to switch the running status of the MCP server (Normal/Stop). After an MCP is stopped, users cannot select it in the chat interface.
+
+#### 1.3.2 MCP Resource
+MCP Resource provides administrators with MCP resource acquisition and site navigation functions, mainly including `MCP Recommend` and `MCP Site`.
+The MCP Recommend page centrally displays MCPs curated and recommended by the platform. These recommended resources feature high availability, rich tool capabilities, and strong community support, making them suitable for new users to quickly get started.
+![](../doc/images/v1.0/admin/mcp_recom_en.png)
+
+For MCPs that support "one-click installation", an "Install" button will be displayed on the card; users can click the "Install" button for one-click installation. If the installation is successful, it will prompt "Installation Successful", otherwise it will prompt "Installation Failed"; users can "Uninstall" already installed MCPs. Successfully installed MCPs can be viewed in the MCP management list.
+
+For recommended MCPs that do not support "one-click installation", users need to obtain API KEY, ACCESS TOKEN, or other information from the respective MCP documentation as instructed, and manually add them through the "Create" interface on the MCP management page.
+
+The MCP Site page aggregates commonly used MCP resource platforms, server repositories, official documentation sites, etc., facilitating administrators to quickly access, search for, and configure required MCPs and related resources.
+![](../doc/images/v1.0/admin/mcp_site_en.png)
+
+Note: Recommended MCPs and site resources are for reference only. It is recommended that administrators verify their availability and security before actual use.
 
 
 ### 1.4 APP
@@ -200,8 +228,13 @@ Users can change model parameters and select tools (such as sensitive filter, we
 
 ![](../doc/images/v1.0/user/chat_content_manage_en.png)
 
+#### 2.1.4 MCP
+Click the "Clieck to Add MCP Service" button to display all currently available MCP servers and add them to the chat. Click the "Check" button to view the tools, resources, and prompt list of the MCP server.
+![](../doc/images/v1.0/user/mcp_select_en.png)
 
-
+After completing the selection, engage in conversation. The model will selectively invoke tools based on the tool information and return the answers.
+![](../doc/images/v1.0/user/mcp_use_en.png)
+![](../doc/images/v1.0/user/mcp_use_en_2.png)
 
 ### 2.3 Agent Management
 
