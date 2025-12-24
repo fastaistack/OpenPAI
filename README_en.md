@@ -71,10 +71,10 @@ There are two categories of images to pull: **Chat images** and **LLM-Serving im
 #### Chat Images (9 images required)
 
 ```
-epaichat:v1.0
+openpaichat:v1.0
 apiserver:v1.1
-epaiparser:v1.0
-epai-ui:latest
+openpaiparser:v1.0
+openpai-ui:latest
 agent-ui:latest
 redis:7.2.4
 quay.io/minio/minio:RELEASE.2023-12-20T01-00-02Z
@@ -92,7 +92,7 @@ After pulling all images, **if your cluster has multiple nodes**, you must pull 
 
 - `apiserver`
 - `agent-ui`
-- `epaiparser`
+- `openpaiparser`
 
 For example, if you have a secondary node named `node2`:
 
@@ -106,7 +106,7 @@ Example commands when using Harbor (modify as needed):
 ```shell
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/agent-ui:latest
-docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epaiparser:v1.0
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaiparser:v1.0
 ```
 
 ------
@@ -159,6 +159,30 @@ After extraction, five corresponding directories will be created.
 ------
 
 ### 3. Deployment
+
+### Database Deployment
+
+If a database already exists on the machine, you can continue using it. Run the following commands in the database to create a user and grant privileges. You may modify the username and password according to your actual needs:
+
+```mysql
+create user 'openpaiadmin' identified by 'OPENPAIChat';
+flush privileges;
+grant all privileges on openpaichat.* to openpaiadmin@'%';
+flush privileges;
+```
+
+If no database is available, it is recommended to directly pull the latest **MariaDB image**. Below is an example of how to pull and start it (adjust as needed):
+
+```shell
+docker pull mariadb:latest
+docker run -d \
+  --name mariadb \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=OPENPAIChat \
+  -v /home/mariadb-data:/var/lib/mysql \
+  mariadb:latest
+```
+
 
 #### Chat Deployment
 
