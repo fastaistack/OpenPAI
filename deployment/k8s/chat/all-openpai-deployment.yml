@@ -1,0 +1,997 @@
+# 1. epai-ui 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-ui
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epai-ui
+  template:
+    metadata:
+      labels:
+        app: epai-ui
+    spec:
+      containers:
+      - name: epai-ui
+        image: {{EPAI_UI_IMAGE}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: API_ADDRESS
+          value: "http://epaichat-service.default.svc.cluster.local:5050/"
+        - name: USER
+          value: "root"
+        - name: HOST_IP
+          value: "https://{{ALL_EPAI_HOST_IP}}:{{epai_ui_port}}"
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-ui-service
+  namespace: default
+spec:
+  type:  NodePort
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    nodePort: {{epai_ui_port}}
+  selector:
+    app: epai-ui
+
+
+# 2、epaichat 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epaichat
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epaichat
+  template:
+    metadata:
+      labels:
+        app: epaichat
+    spec:
+      terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: wait-for-es
+        image: {{EPAI_CHAT_BUSYBOX_IMAGE}}
+        command: ['sh', '-c']
+        args:
+        - |
+          until nc -z epai-es-service 9200; do
+            echo "Waitting for ES service..."
+            sleep 1
+          done
+          echo "ES service is ready!"
+      containers:
+      - name: epaichat
+        image: {{EPAI_CHAT_IMAGE}}  
+        imagePullPolicy: Always
+        ports:
+        - name: chat 
+          containerPort: 5050
+        env:
+        - name: ASST_CONFIG
+          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}' 
+        - name: AISTATION_ADDRESS
+          value: "https://{{ALL_EPAI_HOST_IP}}:32206/#/plate-index"
+        - name: AISTATION_LOGIN_ADDRESS
+          value: "https://{{ALL_EPAI_HOST_IP}}:32206/index.html#/login"
+        - name: IDAM_ADDRESS
+          value: "https://gateway.inais:7979"
+        - name: AIS_MODEL_URL
+          value: "http://model-deploy.default.svc.cluster.local"
+        - name: PARSER_URL
+          value: "http://epai-parser-service.default.svc.cluster.local:5555"
+        - name: EPAI_DB_HOST     
+          value: "{{EPAI_CHAT_DB_HOST}}" 
+        - name: EPAI_DB_PASSWORD
+          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+        - name: EPAI_DB_USER
+          value: "{{EPAI_CHAT_DB_USER}}"
+        - name: ES_HOSTS
+          value: "http://epai-es-service.default.svc.cluster.local:9200"
+        - name: MINIO_HOST
+          value: "epai-minio-service.default.svc.cluster.local:9000"
+        - name: MINIO_USER
+          value: "epai"
+        - name: MINIO_PASSWORD
+          value: "epaichat"
+        - name: REDIS_HOST
+          value: "epai-redis-service.default.svc.cluster.local:6379"
+        - name: REDIS_DB
+          value: "1"
+        - name: REDIS_PASSWORD
+          value: "epai"
+        - name: MACHINE_CODE
+          value: {{EPAI_CHAT_MACHINE_CODE}}
+        - name: EPAI_EVAL_HOST
+          value: "http://epai-eval-service.default.svc.cluster.local:7919"
+        - name: EPAI_MCP_HOST
+          value: "http://epai-mcp-service.default.svc.cluster.local:7920"
+        - name: ENABLE_VISION_MODEL
+          value: "{{EPAI_ENABLE_VISION_MODEL}}"
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        - name: NODEIP
+          value: "{{EPAI_UI_NODEIP}}"
+        - name: USER_API_BASE_URL
+          value: "http://{{ALL_EPAI_HOST_IP}}:32101"
+        - name: INNER_TOKEN
+          value: "9D28C0621CA27CE6ED352ADBE5F208B682DDB8D2796D5FFEEF6A7B39F72D800248B0D94A22B3BFC9085FE21F4EA16232"
+        - name: DB_CHAT_SECRET_KEY
+          value: "isLkGFOxiFymtCbO8H4-fg1ZXz0DHOXIyptIPMGffD4="
+        - name: DB_CHAT_PUBLIC_KEY
+          value: "04fca4acc82182d4344fba1ff72ebe6802925ce5fe20de0f4812bf66a818f218ce652357c3bedfd11a3811968abbc7a9718b265ab64bf339f76f6243c7fe5e97b4"
+        - name: DB_CHAT_PRIVATE_KEY
+          value: "8454ea67d58f3ba923e724d622b880394377680a55f1bc589d899bc5ed3060d8"
+        - name: AGENT_PORTS_START
+          value: "{{EPAI_AGENT_PORTS_START}}"
+        - name: AGENT_HOSTS
+          value: {{EPAI_AGENT_HOSTS}}
+        - name: EPAI_WHISPER
+          value: "http://llm-rag-predictor-default.default.svc:5050"
+        - name: RAG_MODEL_URL
+          value: "http://llm-rag-predictor-default:5051"
+        - name: QWEN_MODEL_URL
+          value: "http://llm-qwen-predictor-default:5051"
+        volumeMounts:
+        - mountPath: /root/.epai
+          name: epai-cache
+
+        # 启动探针：最多等240秒
+        startupProbe:
+          tcpSocket:
+            port: 5050
+          failureThreshold: 120
+          periodSeconds: 2
+          timeoutSeconds: 2
+        
+        # 存活探针：检测内部5050端口是否正常
+        livenessProbe:
+          httpGet:
+            path: /demo/healthcheck
+            port: 5050
+            scheme: HTTP
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # 就绪探针：检测服务ok才接收流量(READY状态由0到1)
+        readinessProbe:
+          tcpSocket:
+            port: 5050
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - name: epai-cache
+        persistentVolumeClaim:
+          claimName: epai-chat-pvc
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epaichat-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: chat
+    port: 5050
+    targetPort: 5050
+  selector:
+    app: epaichat
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: epai-chat
+  name: epai-chat-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:     
+    path: {{EPAI_CHAT_PV_HOST_PATH}}
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: epai-chat-pvc
+    namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: epai-chat
+  name: epai-chat-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: ""
+  volumeName: epai-chat-pv
+
+
+
+
+# 7、epai-eval 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-eval
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epai-eval
+  template:
+    metadata:
+      labels:
+        app: epai-eval
+    spec:
+      containers:
+      - name: epai-eval
+        image: {{EPAI_CHAT_IMAGE}}  
+        imagePullPolicy: Always
+        workingDir: /epaichat
+        command: ["/bin/bash"]
+        args: ["-c", "python eval_server.pyc > /root/epai-eval.log 2>&1"]
+        ports:
+        - name: eval-model
+          containerPort: 7919
+        env:
+        - name: ASST_CONFIG
+          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}' 
+        - name: EPAI_DB_HOST     
+          value: "{{EPAI_CHAT_DB_HOST}}" 
+        - name: EPAI_DB_PASSWORD
+          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+        - name: EPAI_DB_USER
+          value: "{{EPAI_CHAT_DB_USER}}"
+        - name: ES_HOSTS
+          value: "http://epai-es-service.default.svc.cluster.local:9200"
+        - name: MINIO_HOST
+          value: "epai-minio-service.default.svc.cluster.local:9000"
+        - name: MINIO_USER
+          value: "epai"
+        - name: MINIO_PASSWORD
+          value: "epaichat"
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+      
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-eval-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: eval-model
+    port: 7919
+    targetPort: 7919
+  selector:
+    app: epai-eval
+
+
+
+# 8、epai-mcpservers 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-mcp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: epai-mcp
+  template:
+    metadata:
+      labels:
+        app: epai-mcp
+    spec:
+      containers:
+      - name: epai-mcp
+        image: {{EPAI_CHAT_IMAGE}}
+        imagePullPolicy: Always
+        workingDir: /epaichat
+        command: ["/bin/bash"]
+        args: ["-lc", "(nohup python start_preset_mcp.pyc > /root/preset_mcp.log 2>&1 &) && python mcp_pod_server.pyc > /root/epai-mcp.log 2>&1"]
+        ports:
+        - name: mcp-model
+          containerPort: 7920
+        env:
+        - name: ASST_CONFIG
+          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}'
+        - name: EPAI_DB_HOST
+          value: "{{EPAI_CHAT_DB_HOST}}"
+        - name: EPAI_DB_PASSWORD
+          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+        - name: EPAI_DB_USER
+          value: "{{EPAI_CHAT_DB_USER}}"
+        - name: ES_HOSTS
+          value: "http://epai-es-service.default.svc.cluster.local:9200"
+        - name: MINIO_HOST
+          value: "epai-minio-service.default.svc.cluster.local:9000"
+        - name: MINIO_USER
+          value: "epai"
+        - name: MINIO_PASSWORD
+          value: "epaichat"
+        - name: MCP_TASK_CONFIG
+          value: '{"max_mcp_count":100}'
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        volumeMounts:
+          - mountPath: /mcp
+            name: mcp-data
+
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - name: mcp-data
+        persistentVolumeClaim:
+          claimName: epai-mcp-pvc
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-mcp-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: mcp-model
+    port: 7920
+    targetPort: 7920
+  selector:
+    app: epai-mcp
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: epai-mcp
+  name: epai-mcp-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: {{EPAI_MCP_PV_STORAGE}}
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{EPAI_MCP_PV_HOST_PATH}}
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: epai-mcp-pvc
+    namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: epai-mcp
+  name: epai-mcp-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{EPAI_MCP_PV_STORAGE}}
+  storageClassName: ""
+  volumeName: epai-mcp-pv
+
+
+---
+# 3、epai-parser
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    label: epai-parser
+  name: epai-parser
+  namespace: default
+spec:
+  serviceName: epaiparser
+  replicas: {{EPAI_PARSER_REPLICAS}}
+  selector:
+    matchLabels:
+      app: epai-parser
+  template:
+    metadata:
+      labels:
+        app: epai-parser
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - env:
+        - name: ES_HOSTS
+          value: "http://epai-es-service.default.svc.cluster.local:9200"
+        - name: MINIO_HOST
+          value: "epai-minio-service.default.svc.cluster.local:9000"
+        - name: MINIO_USER
+          value: "epai"
+        - name: MINIO_PASSWORD
+          value: "epaichat"
+        - name: REDIS_HOST
+          value: "epai-redis-service.default.svc.cluster.local:6379"
+        - name: REDIS_DB
+          value: "1"
+        - name: REDIS_PASSWORD
+          value: "epai"
+        - name: EPAICHAT
+          value: "http://epaichat-service.default.svc.cluster.local:5050"
+        - name: ENABLE_VISION_MODEL
+          value: "{{EPAI_ENABLE_VISION_MODEL}}"
+        - name: MINERU_MIN_EPOCH_SIZE
+          value: "{{EPAI_PARSER_EPOCH_SIZE}}"
+        - name: PARSER_BATCHSIZE
+          value: "1"
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        resources: 
+          limits:
+            cpu: {{EPAI_PARSER_LIMITS_CPU}}
+            memory: "48Gi"
+          requests:
+            cpu: {{EPAI_PARSER_LIMITS_CPU}}
+            memory: "48Gi"
+        image: {{EPAI_PARSER_IMAGE}}
+        imagePullPolicy: Always
+        name: epai-parser
+        ports:
+        - containerPort: 5555
+          protocol: TCP
+        securityContext:
+          privileged: false
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        inf_use: "{{EPAI_PARSER_NODE_SELECTOR}}"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-parser-service
+  namespace: default
+  labels:
+    app: epai-parser
+spec:
+  ports:
+    - name: epai-parser
+      port: 5555
+      protocol: TCP
+  selector:
+    app: epai-parser
+  type: ClusterIP
+
+
+
+
+
+
+##################################
+###    组件
+###    部署
+##################################
+
+# 4. epai-es 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-es
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: {{EPAI_ES_IMAGE}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9200
+        env:
+        - name: node.name   
+          value: "node1"
+        - name: cluster.name
+          value: "epai"
+        - name: cluster.initial_master_nodes
+          value: "node1"
+        - name: ELASTIC_PASSWORD
+          value: "epaichat"
+        - name: bootstrap.memory_lock
+          value: "false"
+        - name: xpack.security.enabled
+          value: "false"
+        - name: cluster.max_shards_per_node
+          value: "4096"
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: es-data
+        - name: es-config-volume
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        # resources: 
+        #   limits:
+        #     cpu: "8"
+        #     memory: "8Gi"
+        #   requests:
+        #     cpu: "8"
+        #     memory: "8Gi"
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - name: es-data
+        persistentVolumeClaim:
+          claimName: epai-es-pvc
+      - name: es-config-volume
+        configMap:
+          name: es-config
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: es-config
+data:
+  elasticsearch.yml: |-
+    cluster.routing.allocation.disk.threshold_enabled: true
+    cluster.routing.allocation.disk.watermark.low: 30gb
+    cluster.routing.allocation.disk.watermark.high: 20gb
+    cluster.routing.allocation.disk.watermark.flood_stage: 5gb
+    cluster.name: "docker-cluster"
+    network.host: 0.0.0.0
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-es-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: epai-es
+    port: 9200
+    targetPort: 9200
+  selector:
+    app: elasticsearch
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: epai-es
+  name: epai-es-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: {{EPAI_ES_PV_STORAGE}}   
+  accessModes:
+    - ReadWriteMany
+  hostPath: 
+    path: {{EPAI_ES_PV_HOST_PATH}}
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: epai-es-pvc
+    namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: epai-es
+  name: epai-es-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{EPAI_ES_PV_STORAGE}}
+  storageClassName: ""
+  volumeName: epai-es-pv
+
+
+# 5. redis-epai 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: {{EPAI_REDIS_IMAGE}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6379
+        env:
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        command: ["redis-server", "--requirepass", "epai", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+            claimName: epai-redis-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-redis-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: epai-redis
+  name: epai-redis-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:  
+    path: {{EPAI_REDIS_PV_HOST_PATH}}
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: epai-redis-pvc
+    namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: epai-redis
+  name: epai-redis-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ""
+  volumeName: epai-redis-pv
+
+
+
+# 6. minio-epai 配置
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: epai-minio
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: {{EPAI_MINIO_IMAGE}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        env:
+        - name: MINIO_ROOT_USER
+          value: "epai"
+        - name: MINIO_ROOT_PASSWORD
+          value: "epaichat"
+        - name: TZ
+          value: "{{EPAI_TIMEZONE}}"
+        command: ["minio", "server", "--console-address", ":9001", "/data"]
+        volumeMounts:
+        - mountPath: /data
+          name: minio-data
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      tolerations:
+      - effect: NoExecute
+        key: node.kubenetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoExecute
+        key: node.kubenetes.io/unschedulable
+        operator: Exists
+        tolerationSeconds: 1
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - name: minio-data
+        persistentVolumeClaim:
+          claimName: epai-minio-pvc
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: epai-minio-service
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: api
+    port: 9000
+    targetPort: 9000
+  - name: console
+    port: 9001
+    targetPort: 9001
+  selector:
+    app: minio
+
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: epai-minio
+  name: epai-minio-pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: {{EPAI_MINIO_PV_STORAGE}} 
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: {{EPAI_MINIO_PV_HOST_PATH}}
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: epai-minio-pvc
+    namespace: default
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: epai-minio
+  name: epai-minio-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{EPAI_MINIO_PV_STORAGE}}
+  storageClassName: ""
+  volumeName: epai-minio-pv

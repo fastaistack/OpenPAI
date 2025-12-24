@@ -52,6 +52,13 @@ System Menu includes `Log Management`, `System Setting`, `User Management`.
 
 #### 1.6.1 Log Management
 
+After logging in, the administrator clicks **“Log Management”** on the left side of the page to enter this module.
+The log list displays the following information: Operator, Module, Target, Operation type, Result, Feedback, Operation time, and Operations. The Operations include the data before and after the operation.
+
+The administrator can perform combined queries based on criteria such as module, operation type, result, start time, end time, and operator. They can also click **“Reset”** to display the default results. In addition, the administrator can sort the following fields individually: module, operation type, result, and operation time.
+
+The administrator can export the query results based on the selected conditions, with a maximum of 1,000 records per export. The exported file is in **.csv** format.
+
 #### 1.6.2 System Setting
 System settings include two tabs: business configuration and page configuration. Business configuration mainly involves basic business settings for various business modules in the system, aiming to better allocate system resources and utilize system capabilities effectively.
 
@@ -136,6 +143,22 @@ Users can change model parameters and select tools (such as sensitive filter, we
 
 
 ### 2.3 Agent Management
+
+#### 2.3.1 Agent
+
+#### 2.3.2 Worflow
+
+#### 2.3.3 Tool
+
+Tab tool shows user's tool list used in agent or workflow.
+
+![](../doc/images/v1.0/user/tool-list-en.jpg)
+
+User can:
+
+- add tool (BY **API**)
+- delete tool
+- edit tool
 
 ### 2.4 Prompt Management
 

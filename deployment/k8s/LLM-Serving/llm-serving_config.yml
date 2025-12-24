@@ -1,0 +1,12 @@
+
+RAG_HOST_PATH: {{HOST_PATH}}                                         # ——> 主机（Host）IP地址
+# IMAGE_HUB: easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/   # ——> 镜像仓库地址
+
+RAG_IMAGE: llm-serving:8.0                                           # ——> llm-serving基础镜像
+
+RAG_NODE_SELECTOR_LABEL_NAME: inf_use                                # ——> rag部署节点标签名
+RAG_NODE_SELECTOR_LABEL_VALUE: '1'                                   # ——> rag部署节点标签值
+
+PDF_PARSER_DEPLOY: gpu                                               # ——> parser部署方式，cpu部署时：cpu; gpu部署时：gpu                                     
+RAG_LIMITS_CPU: 12                                                   # ——> rag请求CPU资源数量，cpu部署时：18; gpu部署时：12
+RAG_LIMITS_MEMORY: 32Gi                                              # ——> rag请求memory资源大小，cpu部署时：64Gi; gpu部署时：32Gi

@@ -54,20 +54,17 @@
 
 
 
-## 一、镜像：
+### 一、镜像：
 
-chat镜像为：**chat.tar.zst**
-
-RAG镜像为：**llm-serving.tar.zst**
-
-加载镜像命令为：
+通过如下命令拉取镜像：
 
 ```shell
-zstd -dc chat.tar.zst | docker load
-zstd -dc llm-serving.tar.zst | docker load
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<IMAGE-TAG>
 ```
 
-chat加载后有如下9个镜像：
+其中<IMAGE-NAME>:<IMAGE-TAG>为镜像名称:镜像标签，需要拉取的镜像分为**chat镜像**和**LLM-Serving镜像**，两部分镜像名称和镜像标签如下：
+
+chat需要拉取如下9个镜像：
 
 ```
 epaichat:v1.0
@@ -81,52 +78,50 @@ docker.elastic.co/elasticsearch/elasticsearch:8.11.3
 busybox:1.31.0
 ```
 
-RAG加载后有如下一个镜像：
+LLM-Serving需要拉取如下1个镜像：
 
 ```
 llm-serving:8.0
 ```
 
-如果有部署的Harbor，推送加载的**每个镜像**到Harbor中：
-
-```shell
-docker tag <IMAGE>  <Harbor>/<IMAGE>
-docker push <Harbor>/<IMAGE>
-```
-
-其中，<IMAGE>为镜像名称:标签，<Harbor>为Harbor地址，例如：
-
-```shell
-docker tag epaichat:v1.0 172.16.0.128:5000/inais/epaichat:v1.0
-docker push 172.16.0.128:5000/inais/epaichat:v1.0
-```
-
-并在**每个节点**拉取apiserver、agentui和epaiparser的镜像，例如，除了主节点外还有一个node2节点：
+拉取完成后，如果机器有多个节点，需要在**每个节点**拉取apiserver、agentui和epaiparser的镜像，例如，除了主节点外还有一个node2节点：
 
 ```shell
 ssh node2
-docker pull <IMAGE>
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<IMAGE-TAG>
 ```
 
 例如，在有Harbor的情况下，执行类似如下命令，根据实际情况修改：
 
 ```shell
-docker pull 172.16.0.128:5000/inais/apiserver:v1.1
-docker pull 172.16.0.128:5000/inais/agent-ui:latest
-docker pull 172.16.0.128:5000/inais/epaiparser:v1.0
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/agent-ui:latest
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/epaiparser:v1.0
 ```
 
 
 
-## 二、模型：
+### 二、模型：
 
-RAG模型压缩包文件为**rag-model.tar**，下载模型文件到**任意节点（建议有足够CPU和GPU资源，主要用于部署模型）**的任意目录下解压，解压命令：
+首先，先规划一下要将模型放置到哪个节点**（建议有足够CPU和GPU资源，主要用于部署模型）**，然后在该节点下执行如下操作：
+
+拉取模型镜像：
 
 ```shell
-tar -xf rag-model.tar
+docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-model:latest
 ```
 
-解压后会生成**bussiness**文件夹，在该文件夹下会有5个压缩包文件，分别为：
+拷贝模型文件到对应节点任意路径下：
+
+```shell
+docker create --name <CONTAINER-NAME> easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-model:latest
+docker cp <CONTAINER-NAME>:/model/bussiness <HOST_PATH>
+docker rm -f <CONTAINER-NAME>
+```
+
+其中<CONTAINER-NAME>为容器名称，<HOST_PATH>为对应节点的路径（用于存放模型文件）。
+
+拷贝完成后会在对应路径下有**bussiness**文件夹，在该文件夹下会有5个压缩包文件，分别为：
 
 ```
 custom-models.tar.gz
@@ -136,71 +131,75 @@ vl-models.tar.gz
 whisper-models.tar.gz
 ```
 
-将这5个压缩包分别解压，会有5个对应的文件夹。
+将这5个压缩包分别解压：
 
-模型部署的节点需要在第三步RAG部署第1步中修改rag_config.yml中**rag部署节点标签名**和**rag部署节点标签值**，
+```shell
+tar -xf <TAR-PACKAGE>
+```
+
+其中<TAR-PACKAGE>为对应的压缩包名称，解压后会有5个对应的文件夹。
 
 
 
-## 三、部署：
+### 三、部署：
 
-### Chat部署：
+#### Chat部署：
 
 chat部署的yaml文件在项目的**deploymnet/k8s/chat**目录下，先将其单独拷贝出来放到**主节点**任意目录下，然后cd到该目录下执行如下操作：
 
-1、根据实际情况修改**epai_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改
+1、根据实际情况修改**openpai_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改
 
-2、替换主部署文件**all-epai-deployment.yml**：
+2、替换主部署文件**all-openpai-deployment.yml**：
 
-**如下脚本主要用于替换all-epai-deployment.yml中的值，如果不需要或有问题，可以根据实际情况手动指定all-epai-deployment.yml中的部署方式（4个文件夹要建好并给与权限）。**
+**如下脚本主要用于替换all-openpai-deployment.yml中的值，如果不需要或有问题，可以根据实际情况手动指定all-openpai-deployment.yml中的部署方式（4个文件夹要建好并给与权限）。**
 
-执行**replace.sh**脚本将**all-epai-deployment.yml**文件中值替换为**epai_config.yml**中配置的值，其中第一个参数为**主节点的IP**，第二个参数为**主节点**上任意路径（用来持久化存储和存放日志信息），并在该路径下建好如下4个文件夹：**cache**（存放日志）、**mcp_data**、**es_data**（给予777权限：**chmod 777  HOST_PATH/es_data**）、**redis_data**和**minio_data**。
+执行**replace.sh**脚本将**all-openpai-deployment.yml**文件中值替换为**openpai_config.yml**中配置的值，其中第一个参数为**主节点的IP**，第二个参数为**主节点**上任意路径（用来持久化存储和存放日志信息），并在该路径下建好如下4个文件夹：**cache**（存放日志）、**mcp_data**、**es_data**（给予777权限：**chmod 777  HOST_PATH/es_data**）、**redis_data**和**minio_data**。
 
 ```shell
-bash +x replace.sh 10.11.12.13 /path/to/data
+bash +x replace.sh 10.11.12.13 <HOST_PATH>
 ```
 
 3、替换完成后，直接部署：
 
 ```shell
-kubectl apply -f all-epai-deployment.yml
+kubectl apply -f all-openpai-deployment.yml
 ```
 
 
 
-### RAG部署：
+#### LLM-Serving部署：
 
-RAG部署的yaml文件在项目的**deploymnet/k8s/rag**目录下，先将其单独拷贝出来放到**主节点**任意目录下。
+LLM-Serving部署的yaml文件在项目的**deploymnet/k8s/LLM-Serving**目录下，先将其单独拷贝出来放到**主节点**任意目录下。
 
-1、根据实际情况修改**rag_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改;
+1、根据实际情况修改**llm-serving_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改;
 
-2、替换RAG主yaml: 
+2、替换LLM-Serving主yaml: 
 
-如果是**CPU部署RAG**服务，请先在**rag.yml**中将请求和限制的GPU资源**“nvidia.com/gpu: 1”**注释掉或者删除；
+如果是**CPU部署LLM-Serving**服务，请先在**llm-serving.yml**中将请求和限制的GPU资源**“nvidia.com/gpu: 1”**注释掉或者删除；
 
-如果是**GPU部署RAG**服务，请先在**rag.yml**中将环境变量**NVIDIA_VISIBLE_DEVICES及其值**注释掉或者删除。
+如果是**GPU部署LLM-Serving**服务，请先在**llm-serving.yml**中将环境变量**NVIDIA_VISIBLE_DEVICES及其值**注释掉或者删除。
 
-**如下脚本主要用于替换rag.yml中的值，如果不需要或有问题，可以根据实际情况手动指定rag.yml中的部署方式。**
+**如下脚本主要用于替换llm-serving.yml中的值，如果不需要或有问题，可以根据实际情况手动指定llm-serving.yml中的部署方式。**
 
-执行**replace-rag-yaml.sh**脚本将**rag.yml**文件中值替换为**rag_config.yml**中配置的值，其中第一个参数为主节点的IP，第二个参数为解压后的RAG模型**bussiness文件夹**所在位置（**对应节点的路径**）：
+执行**replace-llm-serving-yaml.sh**脚本将**llm-serving.yml**文件中值替换为**llm-serving_config.yml**中配置的值，其中第一个参数为主节点的IP，第二个参数为解压后的LLM-Serving模型**bussiness文件夹**所在位置（**对应节点的路径**）：
 
 ```shell
-bash +x replace-rag-yaml.sh <HOST_IP> <HOST_PATH>
+bash +x replace-llm-serving-yaml.sh <HOST_IP> <HOST_PATH>
 ```
 
-其中<HOST_IP>为主节点IP，<HOST_PATH>为RAG模型所在对应节点的路径，如：
+其中<HOST_IP>为主节点IP，<HOST_PATH>为LLM-Serving模型所在对应节点的路径，如：
 
 ```shell
-bash +x replace-rag-yaml.sh 172.16.0.128 /home/ragmodel
+bash +x replace-llm-serving-yaml.sh 172.16.0.128 /home/model
 ```
 
-3、如果是**CPU部署RAG**服务，请先执行如下命令：
+3、如果是**CPU部署LLM-Serving**服务，请先执行如下命令：
 
 ```shell
 cp Param-rag-cpu.yaml Param-rag.yaml
 ```
 
-如果是**GPU部署RAG**服务，请先执行如下命令：
+如果是**GPU部署LLM-Serving**服务，请先执行如下命令：
 
 ```shell
 cp Param-rag-gpu.yaml Param-rag.yaml
@@ -212,10 +211,10 @@ cp Param-rag-gpu.yaml Param-rag.yaml
 bash +x replace-rag-param.sh <HOST_PATH>
 ```
 
-其中<HOST_PATH>为RAG模型**bussiness文件夹**所在对应节点的路径，如：
+其中<HOST_PATH>为LLM-Serving模型**bussiness文件夹**所在对应节点的路径，如：
 
 ```shell
-bash +x replace-rag-param.sh /home/ragmodel
+bash +x replace-rag-param.sh /home/model
 ```
 
 然后拷贝修改后的Param-rag.yaml文件到RAG模型下的bussiness目录下
@@ -227,8 +226,10 @@ cp Param-rag.yaml <HOST_PATH>/bussiness/
 完成后，直接部署：
 
 ```shell
-kubectl apply -f rag.yml
+kubectl apply -f llm-serving.yml
 ```
+
+
 
 
 
