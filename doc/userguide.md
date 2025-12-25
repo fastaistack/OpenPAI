@@ -205,6 +205,45 @@ Users can change model parameters and select tools (such as sensitive filter, we
 ![](../doc/images/v1.0/user/chat_tool_en.png)
 
 
+##### 2.1.1.1 Knowledge Base retriever Tool
+
+###### 2.1.1.1.1 Retrieval Parameter Configuration
+
+![Knowledge Base Q&A](../doc/images/v1.0/knowledge/kb_qa_en.png)
+
+On the regular conversation page, activate the [retrievers] tool and click the [Settings] button. A knowledge base configuration page will appear in the right menu bar. The parameters from top to bottom are:
+
+- Large Language Model Retrieval-Augmented Generation: Enabled by default. When enabled, after retrieving based on the user's question, the answer is processed by a large language model before output. When disabled, the most similar answer is directly retrieved and returned based on the user's question. When enabled, you can select from both document knowledge bases and question-answer knowledge bases. When disabled, only question-answer knowledge bases can be selected.
+
+- Add Knowledge Base: By default, 1-20 knowledge bases can be selected, and one knowledge base can be set as the primary library. A maximum of one knowledge base can be set as the primary library. Setting a primary library means that relevant content is primarily retrieved from this library.
+
+- Result Reranking: Indicates whether retrieval results need to be reordered by a Rerank model. Enabled by default.
+
+- Recall Count: Represents the number of text chunks finally recalled. Default is 10.
+
+- Reply Logic When Recall is Empty: Divided into two options: fixed reply and large language model generation. When fixed reply is selected, users can set custom reply text. When large language model generation is selected, the model answers the user question based on its own capabilities.
+
+- Personalized Prompt: Also known as Prompt template. After background information is retrieved, the Prompt template is used to construct the prompt. If you are uncertain, use the default template. Currently, different templates can be automatically adapted based on the selected model.
+
+- Show Reference Source: Whether to display superscripts and reference sources in the final model-generated response. Enabled by default.
+
+    > When adding knowledge bases, the knowledge base list is divided into three tabs: All, Personal Creation, and Shared by Others, with filtering by type, language, and name supported. A maximum of 20 knowledge bases can be selected.
+
+###### 2.1.1.1.2 Knowledge Base Parameter Configuration
+In the selected knowledge bases, click the [Configuration] button on the knowledge base card to configure retrieval-related parameters. The page displays default parameters set when the knowledge base was created, and these parameters can be modified.
+
+The retrieval process consists of two stages: coarse ranking and fine ranking. The coarse ranking stage primarily removes text that does not meet criteria and returns the first stage retrieval results. In the fine ranking stage, further similarity calculations are performed based on coarse ranking results to obtain qualified text results. For specific parameter descriptions, see the [Retrieval Testing](#retrieval-test) section.
+
+###### 2.1.1.1.3 Knowledge Source Citation
+After selecting the knowledge base, enter a question in the input box to perform question-answering based on the knowledge base. The response will provide corresponding reference sources and cited content based on actual citations. Click on a reference source to jump to the corresponding file, ensuring the model's answer is grounded in evidence.
+
+Image source attribution is now supported. If the user's question is related to an image in the document, the corresponding image will be displayed. Users can click the reference superscript ([1] [2] [3]) below the image to jump to the original location.
+
+Additionally, the reference sources section displays citation information for the corresponding documents in the knowledge base. As shown in the figure, clicking the reference superscript next to a file name jumps to the original location. Users can also download the corresponding document.
+
+![](../doc/images/v1.0/knowledge/kb_qa_citation_en.png)
+
+
 #### 2.1.2 chat management
 
 - The system supports operations such as adding, deleting, modifying, and querying chat, changing names, and deleting chat
@@ -565,6 +604,7 @@ Regular users click on the [Knowledge Base] menu to enter the knowledge base pag
 ##### 2.6.4.2 Reference Navigation
 Click on a document to display a dropdown menu showing the document's reference information in conversations. Clicking on a specific record jumps to the reference location in the corresponding conversation.
 
+<a id="retrieval-test"></a>
 #### 2.6.5 Retrieval Testing
 
 ##### 2.6.5.1 Retrieval Testing
