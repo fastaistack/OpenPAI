@@ -227,7 +227,6 @@ Page configuration primarily involves flexible configuration of the system to me
 #### 1.6.3 User Management
 On the homepage, you can click the **"Application"** menu and select the `User Management` submenu to access the user management module. The information displayed in the user list includes: username, role, description, creation time, and actions (password reset and deletion).
 The administrator can create new users. The default password for the administrator is admin@123, and the default password for regular users is 123456a?
----
 
 ## 2. Standard User Functions
 
