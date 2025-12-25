@@ -655,7 +655,7 @@ The encoding model can be selected from: bce-embedding-base_v1, bge-m3, or Yuan-
 
     - bce-embedding-base_v1: Excels in bilingual Chinese-English and cross-lingual semantic representation capability, with vector dimension of 768. BCE-Embedding is an open-source model released by NetEase Youdao, specifically optimized for RAG scenarios in various domains such as education, law, finance, and healthcare.
     - bge-m3: Released by the Beijing Academy of Artificial Intelligence, supports multiple languages including Chinese, English, Japanese, and Korean, with excellent capabilities in multilingual and cross-lingual representation and retrieval. Supports input text length up to 8192, with vector dimension of 1024.
-    - Yuan-embedding-1.0: Released by Inspur Information, specifically designed to enhance Chinese text retrieval capability. The default vector dimension is 1792, with excellent performance across multiple domains such as healthcare, news, and encyclopedic knowledge. Compared to other models of the same scale, it often has better retrieval precision and recall.
+    - Yuan-embedding-1.0: Specifically designed to enhance Chinese text retrieval capability. The default vector dimension is 1792, with excellent performance across multiple domains such as healthcare, news, and encyclopedic knowledge. Compared to other models of the same scale, it often has better retrieval precision and recall.
 
 (4) Knowledge Base Retrieval Configuration
 
