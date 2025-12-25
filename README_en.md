@@ -51,7 +51,6 @@ This project is primarily deployed using **Kubernetes (K8s)**. Please make sure 
 ```
 1. Operating System: Ubuntu
 2. Deployment:       Kubernetes
-3. Python Version:   3.10.14
 ```
 
 ------

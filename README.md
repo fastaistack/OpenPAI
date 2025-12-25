@@ -49,7 +49,6 @@
 ```
 1、系统：       ubuntu
 2、部署:        Kubernetes
-3、Python版本:  3.10.14
 ```
 
 
