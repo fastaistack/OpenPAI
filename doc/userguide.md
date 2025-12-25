@@ -69,6 +69,34 @@ Note: Recommended MCPs and site resources are for reference only. It is recommen
 
 #### 1.4.3 Prompt
 
+On the home page, click the `Prompt` submenu under **App** to enter the prompt engineering management module:
+
+- Display all prompts on the platform
+- Support paginated display
+- Support search and query by prompt name or content
+- Support ascending and descending sorting by title, create time, and update time
+- Support sharing, transferring, and deleting prompts, all of which support batch operations
+
+![](../doc/images/v1.0/admin/prompt_list_en.png)
+
+##### 1.4.3.1 Prompt Sharing
+You can share prompts with other users or user groups through the prompt sharing feature.
+
+- After entering the prompt sharing page, you can set the sharing scope. The default scope of each prompt is **“Self Only”**. The sharing scope can be **“Specific Users”** or **“All Users”**. When **“All Users”** is selected, the prompt is shared with all users.
+- When **“Specific Users”** is selected, the prompt is shared with specific users or user groups. The initial sharing list is empty, meaning it is not shared with anyone. Click **“Add”** to open the add-user page, where all user groups and all users under the current user’s groups are displayed; you can share with user groups or individual users. After confirmation, you return to the sharing page and can see the selected users or user groups and remove any of them if needed. Click **“Confirm”** on the sharing page to take effect.
+- Batch sharing is supported: on the list page, select multiple prompts and click the **“Share”** button to enter the sharing page. When performing batch sharing, all existing sharing records of the selected prompts will be cleared and replaced by the latest sharing configuration. Please pay attention to this behavior when using batch sharing.
+
+##### 1.4.3.2 Prompt Ownership Transfer
+
+You can transfer prompts created by a user to another user through the prompt ownership transfer feature. Batch transfer is also supported.
+
+- After entering the prompt ownership transfer page, you can select a target user from the user list, or search by name and select a user from the search results for transfer.
+- Once the transfer takes effect, the target user can view the corresponding prompts. The transfer will not affect the original sharing scope of the prompts; that is, if a prompt has already been shared with other users, transferring its ownership will not affect other users’ permissions to view or use the prompt.
+
+##### 1.4.3.3 Prompt Delete
+Administrator users can delete any prompts, supporting both single and batch deletion.
+
+
 #### 1.4.4 App Eval
 
 On the homepage, click the **"Applications"** submenu under the "Application Evaluation" sub-menu to access the Application Evaluation Management module. The information displayed in the task list includes: task name, creator, type, evaluation object, evaluation set (only for dialogue tasks and manual evaluation tasks, no evaluation set is shown as "--"; for batch evaluation tasks, the evaluation set name is displayed), number of evaluation questions (shown as the number of questions asked), status, and actions.
@@ -133,6 +161,39 @@ The transfer function allows administrators to transfer a specified database con
 ![](../doc/images/v1.0/admin/database.png)
 
 #### 1.5.3 Professional Lexicon
+
+On the home page, click the `Professional Lexicon` submenu under **Data** to enter the professional lexicon management module.
+
+- Display the list of all professional lexicons on the platform  
+- Support paginated display  
+- Support search and filtering by category, sharing scope, name, and creator  
+- Support **Reset** to clear all filter conditions  
+- Support ascending and descending sorting by name, creation time, and update time  
+- Support sharing, transferring, and deleting lexicons, all of which support batch operations  
+
+![](../doc/images/v1.0/admin/lexicon_list_en.png)
+
+#### 1.5.3.1 Lexicon Sharing
+
+You can share lexicons with other users or user groups through the lexicon sharing feature.
+
+- After entering the lexicon sharing page, you can select the sharing scope. The default scope of each lexicon is **“Only Me”**. The sharing scope can be **“Some Users”** or **“All Users”**. When **“All Users”** is selected, the lexicon is shared with all users, with view and use permissions.
+- When **“Some Users”** is selected, the lexicon is shared with specific users or user groups. The initial sharing list is empty, meaning it is not shared with anyone. Click **“Add”** to open the add-user page, where all user groups and all users under the current user’s groups are displayed; you can share with user groups or individual users. After confirmation, you return to the sharing page and can see the selected users or user groups and remove any of them if needed. Click **“Confirm”** on the sharing page to take effect.
+- Batch sharing is supported: on the list page, select multiple lexicons and click the **“Share”** button to enter the sharing page. When performing batch sharing, all existing sharing records of the selected lexicons will be cleared and replaced by the latest sharing configuration. Please pay attention to this behavior when using batch sharing.
+- After the sharing operation takes effect, all shared users or members of shared user groups can see the corresponding lexicons in the Professional Lexicon module.
+
+#### 1.5.3.2 Lexicon Ownership Transfer
+
+You can transfer professional lexicons created by a user to another user through the lexicon ownership transfer feature. Batch transfer is also supported.
+
+- After entering the lexicon ownership transfer page, you can select a target user from the user list, or search by name and select a user from the search results for transfer.
+- Once the transfer takes effect, the target user can view the corresponding professional lexicons. The transfer will not affect the original sharing scope of the lexicons; that is, if a lexicon has already been shared with other users, transferring its ownership will not affect other users’ permissions to view or use the lexicon.
+
+#### 1.5.3.4 Lexicon Deletion
+
+Administrator users can delete any professional lexicons, supporting both single and batch deletion.
+
+**Note**: Deleting a lexicon will also delete all words within the lexicon. Please proceed with caution when deleting professional lexicons.
 
 
 ### 1.6 System
@@ -267,7 +328,62 @@ Additionally, the reference sources section displays citation information for th
 
 ![](../doc/images/v1.0/user/chat_content_manage_en.png)
 
-#### 2.1.4 MCP
+#### 2.2.4 Chat Tools
+
+##### 2.2.4.1 Sensitive Filter Tool
+
+![](../doc/images/v1.0/user/tool_security_en.png)
+
+Activate the **preprocess_sensitive_filter** tool and click the **Settings** button. The tool parameter configuration page will be displayed in the right sidebar.
+
+- The **preprocess_sensitive_filter** tool supports three content review methods: **Local thesaurus**, **Third Party Api**, and **Models Semantic Filter**. By default, **Local thesaurus** is used when the tool is enabled.
+- The three review methods are presented as checkboxes and can be freely combined. After modifying parameters, click **Save** to apply the changes.
+- Click **Reset** to restore parameters to their initial default values, then click **Save** to apply.
+
+**Local thesaurus** supports the following parameters:
+- **Interval Tokens**: default is 10, meaning the model performs a detection every 10 characters output. The larger this value, the coarser the detection granularity and the less time consumed. To ensure all content is reviewed, a detection will always be performed after the model finishes output.
+- **Preset Lexicon**: system-preset blacklist lexicon, enabled by default and cannot be modified by users.
+- **Blacklist Lexicon**: selecting a lexicon enables it. Content in the **Blacklist Lexicon** is prohibited from being output.
+- **Whitelist Lexicon**: selecting a lexicon enables it. Content in the **Whitelist Lexicon** is allowed to be output.
+- After modifying **Blacklist Lexicon** or **Whitelist Lexicon**, click **Save** to apply. **Whitelist Lexicon** has higher priority than **Blacklist Lexicon**. If a word is in the whitelist, it will not be blocked even if it is also in the blacklist.
+- To add **Blacklist Lexicon** or **Whitelist Lexicon**: click the ⊕ button on the right to open a dialog showing all available blacklist/whitelist lexicons, with pagination support and name search. Click **Use** to select a lexicon (the button changes to "Unuse"). Click **Cancel** to stop using the lexicon. A maximum of 5 blacklist lexicons and 5 whitelist lexicons can be selected. If the limit is exceeded, further selection is not allowed and the "Use" button is grayed out.
+
+**Third Party Api** currently only supports Baidu Intelligent Cloud's content review product, requires internet connection, and allows configuration of API KEY and SECRET KEY.
+
+**Models Semantic Filter** relies on a semantic model fine-tuned on large amounts of data to accurately identify various sensitive texts and their variant non-compliant content. The semantic model must be in a ready state before use.
+- Review types include **politic**, **porn**, **insult**, and **violence**, which can be freely enabled or disabled. The default threshold for all types is 0.8. Checking the **politic** checkbox means the political detection model will score the content to be reviewed. If the score exceeds the set threshold, it indicates non-compliant content; otherwise, it does not. Other detection models work similarly. If the **politic** checkbox is not checked, the content will not be scored for political content, and the **politic** threshold will not take effect.
+
+If sensitive information is detected in the input, the system returns "Sorry, your input contains sensitive information. Please re-enter" to prompt the user to change the topic. If no sensitive information is detected, the system proceeds normally to the inference step.
+
+If sensitive information is detected in the model output, the system returns "Sorry, the model output contains sensitive information. Please try again or change the topic." If no sensitive information is detected, the inference result is displayed normally.
+
+##### 2.2.4.2 Web Search Tool
+
+![](../doc/images/v1.0/user/tool_web_en.png)
+
+Activate the **preprocess_web_argument** tool and click the **Settings** button. The tool parameter configuration page will be displayed in the right sidebar.
+
+Search methods include Bing Search, Google Search, and Bocha Search. Click the radio button to switch between them.
+- **Full-text Search**: disabled by default. When enabled, it parses the full content of web pages; when disabled, it only uses the content summary of web pages.
+- **DeepSearch**: disabled by default. When enabled, it displays results according to the following rules: ① Analyze the user's question; if it is a complex question, generate task steps; if it is a simple question, output the result directly; ② Each step status: Not Started → In Progress → Completed; ③ Each step has corresponding result output that can be viewed by clicking. When disabled, it directly outputs the answer.
+- **Source TopK**: the number of reference URLs finally input to the large model. The larger this value, the longer the reference text and the slower the inference speed. The default value is 3, and the maximum is 8.
+- **Google Serper**: requires a Key for calling the Serper API. Register and apply at the Serper website (https://serper.dev/).
+- **Bocha**: requires a Key for calling the Bocha API. Register and apply at the Bocha website (https://open.bochaai.com/).
+
+After modifying parameters, click **Save** to apply. Click **Reset** to restore parameters to their initial default values, then click **Save** to apply.
+
+##### 2.2.4.3 Prompt Tool
+
+![](../doc/images/v1.0/user/tool_prompt_en.png)
+
+Click the prompt tool icon in the bottom right corner of the dialog box to display commonly used prompts; click again to close.
+
+- Click the **Prompt A** button to insert Prompt A into the input area. The content in the input area can be edited by the user.
+- Click **Management** to enter the **Prompt Manage** page to view details. Click × to close the **Prompt Manage** page.
+- Usage is consistent with **2.4 Prompt Management**
+
+
+##### 2.2.4.4 MCP
 Click the "Clieck to Add MCP Service" button to display all currently available MCP servers and add them to the chat. Click the "Check" button to view the tools, resources, and prompt list of the MCP server.
 ![](../doc/images/v1.0/user/mcp_select_en.png)
 
@@ -321,6 +437,62 @@ User can:
 - edit tool
 
 ### 2.4 Prompt Management
+
+Click the **“Prompt”** button in the **App** module to display the list of all prompts, including title, content, creator, creation time, and update time. By default, the list shows prompts created by the user and prompts shared by others.
+
+- **Only Me**: filter and display only prompts created by the current user  
+- **Search**: support fuzzy query by title or content  
+- **Reset**: clear all filter conditions  
+- Support sorting by title, create time, and update time  
+- Support paginated display  
+
+![](../doc/images/v1.0/user/prompt_list_en.png)
+
+#### 2.4.1 Prompt Management
+
+The prompt management page provides 13 preset prompts for different application scenarios, with two tabs:
+- **All**: shows all prompts, ordered by creation time in descending order  
+- **Usual**: shows prompts marked as favorites, ordered by the time of favoriting/editing in descending order
+
+- **View**: hover the mouse over the prompt content to view the full text  
+- **Collection**: click **Collection** to mark a prompt as commonly used; it will then appear under the **Usual** tab. Click **Cancel** to remove it from favorites  
+
+#### 2.4.2 Add and Edit Prompt
+
+On the **Prompt** page, click **Add** to open the **Create** dialog. Users can fill in the content according to the form; fields marked with a red asterisk are required. Click **Create** to close the dialog, and the new prompt will appear on the **Prompt Management** page.
+
+Click **Edit** to open the edit dialog for an existing prompt. After modifying the prompt content, click **Save**. Reopening the prompt will display the updated content.
+
+#### 2.4.3 Prompt Sharing
+
+- **Single Sharing**
+
+  Click the **Share** button to the right of a prompt to open the user selection dialog. After selecting target users and clicking **Confirm**, the sharing is completed. Shared users can only view and use the shared prompts; they do not have permission to perform other operations.  
+  You can configure the sharing scope of each prompt. The default scope is **“Self Only”**. The sharing scope can be **“Specific Users”** or **“All Users”**. When **“All Users”** is selected, the prompt is shared with all users.
+
+  When **“Specific Users”** is selected, the prompt is shared with specific users or user groups. The initial sharing list is empty, meaning it is not shared with anyone. Click **Add** to open the add-user page, where all user groups and all users under the current user’s groups are displayed; you can share with user groups or individual users. After confirmation, you return to the sharing page and can see the selected users or user groups and remove any of them if needed. Click **Confirm** on the sharing page to take effect.
+
+- **Batch Sharing**
+
+  Batch sharing is supported: on the list page, select multiple prompts and click the **Share** button to enter the sharing page. When performing batch sharing, all existing sharing records of the selected prompts will be cleared and replaced by the latest sharing configuration. Please pay attention to this behavior when using batch sharing.
+
+#### 2.4.4 Prompt Ownership Transfer
+
+- **Single Transfer**
+
+  **Transfer** means transferring ownership, equivalent to changing the creator. Click the **Transfer** button to the right of a prompt to open the target user selection dialog. You can select a user from the list or search by name and select a user from the search results. Click **Confirm** to complete the transfer. The target user will then have full permissions on the prompt.
+
+- **Batch Transfer**
+
+  Select the prompts to be transferred, then click the **Transfer** button above the list to open the target user selection dialog. After selecting the target user and clicking **Confirm**, the batch transfer is completed. The target user will have full permissions on the transferred prompts.
+
+#### 2.4.5 Prompt Delete
+
+- **Single Delete**  
+  Click the **Delete** button to the right of a prompt created by the current user. A confirmation dialog will pop up. Click **Yes** to complete the deletion, and the prompt will be removed from the list.
+
+- **Batch Delete**  
+  Select the prompts to be deleted, then click the **Delete** button above the list. A secondary confirmation dialog will pop up. Click **Yes** to complete the batch deletion.
 
 ### 2.5 App Eval Management
 
@@ -660,7 +832,103 @@ AI Learning The data in the AI Learning Respositiry data is divided into three t
 
 ### 2.8 Professional Lexicon Management
 
-### 2.4 Prompt Management
+Click the **“Professional Lexicon”** button under the **Data** module to display the list of all lexicons, including name, category, description, sharing scope, word count, creator, creation time, and update time. By default, the list shows all lexicons created by the user and those shared with the user by others.
+
+- **Only Me**: filter to show only lexicons created by the current user  
+- **Inquire**: support combined filtering by category, sharing scope, and fuzzy search by name  
+- **Reset**: clear all filter conditions  
+- Support sorting by name, creation time, and update time  
+- Support paginated display  
+
+**Note**: The maximum number of lexicons a user can create is limited by the system parameter **“Maximum Wordbase per User Can Create”**.
+
+![](../doc/images/v1.0/user/lexicon_list_en.png)
+
+#### 2.8.1 Add and Edit Lexicon
+
+On the **Professional Lexicon** page, click **Add** to open the create-lexicon dialog. Users can fill in the content according to the form; fields marked with a red asterisk are required.  
+- **Name**: required, up to 10 characters  
+- **Category**: required, default is **Black List**, and can be changed according to actual needs  
+- **Description**: optional, up to 100 characters  
+
+Click **Create** to close the dialog and display the newly created lexicon in the list.
+
+Click **Edit** to open the edit dialog for an existing lexicon. You can modify the name, category, and description. After editing, click **Save**, and the next time you open it, the updated content will be displayed.
+
+#### 2.8.2 Lexicon Sharing
+
+- **Single Sharing**
+
+  Click the **Share** button to the right of a lexicon to open the lexicon sharing page, where you can configure the sharing scope. The default scope of each lexicon is **“Self Only”**. The sharing scope can be **“Specific Users”** or **“All Users”**. When **“All Users”** is selected, the lexicon is shared with all users.
+
+  When **“Specific Users”** is selected, the lexicon is shared with specific users or user groups. The initial sharing list is empty, meaning it is not shared with anyone. Click **Add** to open the add-user page, where all user groups and all users under the current user’s groups are displayed; you can share with user groups or individual users. After confirmation, you return to the sharing page and can see the selected users or user groups and remove any of them if needed. Click **Confirm** on the sharing page to take effect.
+
+- **Batch Sharing**
+
+  Batch sharing is supported: on the list page, select multiple lexicons and click the **Share** button above the list to enter the sharing page. When performing batch sharing, all existing sharing records of the selected lexicons will be cleared and replaced by the latest sharing configuration. Please pay attention to this behavior when using batch sharing.
+
+  After the sharing operation takes effect, all shared users or members of shared user groups can see the corresponding lexicons in the Professional Lexicon module.
+
+#### 2.8.3 Lexicon Ownership Transfer
+
+- **Single Transfer**
+
+  **Transfer** means transferring ownership, equivalent to changing the creator. Click the **Transfer** button to the right of a lexicon to open the target user selection dialog. You can select a group member or specify a user account to select a specific user. After selecting the target user and clicking **Confirm**, the transfer is completed, and the target user will have full permissions on the lexicon.
+
+- **Batch Transfer**
+
+  Select the lexicons to be transferred, then click the **Transfer** button above the list to open the target user selection dialog. After selecting the target user and clicking **Confirm**, the batch transfer is completed, and the target user will have full permissions on the transferred lexicons.
+
+  The transfer operation will not affect the original sharing scope of the lexicons; that is, if a lexicon has already been shared with other users, transferring its ownership will not affect other users’ permissions to view or use the lexicon.
+
+#### 2.8.4 Lexicon Deletion
+
+- **Single Deletion**  
+  Click the **Delete** button to the right of a lexicon created by the current user. A confirmation dialog will pop up. Click **Yes** to complete the deletion, and the lexicon will be removed from the list.
+
+- **Batch Deletion**  
+  Select the lexicons to be deleted, then click the **Delete** button above the list. A secondary confirmation dialog will pop up. Click **Yes** to complete the batch deletion.
+
+#### 2.8.5 View Lexicon Words
+
+Click a lexicon to view its content. The word list displays the following columns:
+- Content  
+- Category  
+- Upload time  
+- Update time  
+
+- Support fuzzy search by content; click **Reset** to clear the search criteria  
+- If the lexicon is a whitelist, the **Category** field displays “-”  
+- If the lexicon is a blacklist, the **Category** field is determined by user configuration  
+- Support paginated display  
+
+![](../doc/images/v1.0/user/lexicon_word_list_en.png)
+
+#### 2.8.6 Import and Edit Lexicon Words
+
+Adding words to a lexicon supports two methods: page add and **.xlsx** template import.
+
+- **Page Add**  
+  Click the **Add** button in the upper right corner to add words. For blacklist lexicons, each word entry includes **content** and **type**; for whitelist lexicons, only **content** is required.
+
+  - **Content**: supports multi-line input, with one word per line, each word limited to 20 characters, maximum 100 lines. Spaces and empty lines are filtered during import  
+  - **Type**: user-configured word category  
+  - Click **Import** to complete the batch import of words. After import, the words are displayed in the lexicon with pagination  
+
+  **Note**: Duplicate words in the same lexicon are only added once. The maximum number of words that can be imported into a single lexicon is limited by the system parameter **“Maximum words per WordBase”**.
+
+- **.xlsx Template Import**  
+  - The system provides an **.xlsx** template. Users can click **Template.xlsx** to download it, which includes two columns: content and type  
+  - Click **Template Import**, select the edited **.xlsx** file, and click **Open** to import the words. Empty lines and rows with empty content will be filtered, and only the first 20 characters of the content are retained  
+  - After import, the words are displayed in the lexicon with pagination  
+
+Click **Edit** to modify the word type and content. After editing, click **Import** to apply the changes.
+
+#### 2.8.7 Lexicon Word Deletion
+
+- **Single Word Deletion**: click the **Delete** button to the right of a word to delete it  
+- **Delete All**: click the **Delete All** button in the upper right corner. A secondary confirmation dialog will pop up. Click **Yes** to delete all words in the lexicon  
+
 
 ### 2.9 Preferences Management
 
