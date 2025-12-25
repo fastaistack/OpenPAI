@@ -68,6 +68,7 @@ spec:
     app: openpai-ui
 
 
+
 # 2、openpaichat 配置
 ---
 apiVersion: apps/v1
