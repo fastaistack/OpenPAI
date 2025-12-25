@@ -43,7 +43,13 @@ Click "Confirm", and the system will automatically validate the parameters and a
 Click the "Check" button to view the basic configuration information of the MCP server, including server name, server description, keywords, and tool list.
 ![](../doc/images/v1.0/admin/mcp_detail_en.png)
 
-Click the "Stop" or "Start" button to switch the running status of the MCP server (Normal/Stop). After an MCP is stopped, users cannot select it in the chat interface.
+Click the "Stop" or "Start" button to switch the running status of the MCP server (Normal/Stop). After an MCP is stopped, users cannot select it in the chat interface. After clicking to start, if the original MCP can connect successfully, the status will switch to "Normal," and users can view and use the MCP. If the MCP connection fails, the MCP cannot be started, and the server status will switch to "Error."
+
+Click the "Edit" button to modify basic information such as the server name, server description, provider, keywords, duration limit, etc.
+
+Click the delete button in the corresponding MCP operation item in the list to delete the MCP after secondary confirmation.
+
+Check the checkbox in front of the server name to select multiple MCPs, and click the "Delete" button above the list to batch delete the selected MCPs after secondary confirmation.
 
 #### 1.3.2 MCP Resource
 MCP Resource provides administrators with MCP resource acquisition and site navigation functions, mainly including `MCP Recommend` and `MCP Site`.
@@ -348,8 +354,10 @@ Click the prompt tool icon in the bottom right corner of the dialog box to displ
 Click the "Clieck to Add MCP Service" button to display all currently available MCP servers and add them to the chat. Click the "Check" button to view the tools, resources, and prompt list of the MCP server.
 ![](../doc/images/v1.0/user/mcp_select_en.png)
 
-After completing the selection, engage in conversation. The model will selectively invoke tools based on the tool information and return the answers.
+After completing the selection, engage in conversation. The model will selectively invoke tools based on the tool information and return the answers. A maximum of three MCP tools/resources/prompts can be invoked in a single conversation. Multiple tools/resources/prompts can be invoked simultaneously in one call.
 ![](../doc/images/v1.0/user/mcp_use_en.png)
+
+During the conversation, the input parameters, output results, and invocation status of the tools/resources/prompts will be displayed.
 ![](../doc/images/v1.0/user/mcp_use_en_2.png)
 
 
