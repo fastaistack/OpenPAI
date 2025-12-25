@@ -1,33 +1,33 @@
-# 1. epai-ui 配置
+# 1. openpai-ui 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-ui
+  name: openpai-ui
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: epai-ui
+      app: openpai-ui
   template:
     metadata:
       labels:
-        app: epai-ui
+        app: openpai-ui
     spec:
       containers:
-      - name: epai-ui
-        image: {{EPAI_UI_IMAGE}}
+      - name: openpai-ui
+        image: {{OPENPAI_UI_IMAGE}}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
         - name: API_ADDRESS
-          value: "http://epaichat-service.default.svc.cluster.local:5050/"
+          value: "http://openpaichat-service.default.svc.cluster.local:5050/"
         - name: USER
           value: "root"
         - name: HOST_IP
-          value: "https://{{ALL_EPAI_HOST_IP}}:{{epai_ui_port}}"
+          value: "https://{{ALL_OPENPAI_HOST_IP}}:{{openpai_ui_port}}"
       nodeSelector:
         node-role.kubernetes.io/master: "true"
       restartPolicy: Always
@@ -55,7 +55,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-ui-service
+  name: openpai-ui-service
   namespace: default
 spec:
   type:  NodePort
@@ -63,94 +63,95 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-    nodePort: {{epai_ui_port}}
+    nodePort: {{openpai_ui_port}}
   selector:
-    app: epai-ui
+    app: openpai-ui
 
 
-# 2、epaichat 配置
+
+# 2、openpaichat 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epaichat
+  name: openpaichat
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: epaichat
+      app: openpaichat
   template:
     metadata:
       labels:
-        app: epaichat
+        app: openpaichat
     spec:
       terminationGracePeriodSeconds: 5
       initContainers:
       - name: wait-for-es
-        image: {{EPAI_CHAT_BUSYBOX_IMAGE}}
+        image: {{OPENPAI_CHAT_BUSYBOX_IMAGE}}
         command: ['sh', '-c']
         args:
         - |
-          until nc -z epai-es-service 9200; do
+          until nc -z openpai-es-service 9200; do
             echo "Waitting for ES service..."
             sleep 1
           done
           echo "ES service is ready!"
       containers:
-      - name: epaichat
-        image: {{EPAI_CHAT_IMAGE}}  
+      - name: openpaichat
+        image: {{OPENPAI_CHAT_IMAGE}}  
         imagePullPolicy: Always
         ports:
         - name: chat 
           containerPort: 5050
         env:
         - name: ASST_CONFIG
-          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}' 
+          value: '{"image":"{{OPENPAI_CHAT_API_IMAGE}}","uiimage":"{{OPENPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{OPENPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{OPENPAI_CHAT_API_CPU}}","memory":"{{OPENPAI_CHAT_API_MEMORY}}","TZ":"{{OPENPAI_TIMEZONE}}","NODEIP":"{{OPENPAI_UI_NODEIP}}"}' 
         - name: AISTATION_ADDRESS
-          value: "https://{{ALL_EPAI_HOST_IP}}:32206/#/plate-index"
+          value: "https://{{ALL_OPENPAI_HOST_IP}}:32206/#/plate-index"
         - name: AISTATION_LOGIN_ADDRESS
-          value: "https://{{ALL_EPAI_HOST_IP}}:32206/index.html#/login"
+          value: "https://{{ALL_OPENPAI_HOST_IP}}:32206/index.html#/login"
         - name: IDAM_ADDRESS
           value: "https://gateway.inais:7979"
         - name: AIS_MODEL_URL
           value: "http://model-deploy.default.svc.cluster.local"
         - name: PARSER_URL
-          value: "http://epai-parser-service.default.svc.cluster.local:5555"
+          value: "http://openpai-parser-service.default.svc.cluster.local:5555"
         - name: EPAI_DB_HOST     
-          value: "{{EPAI_CHAT_DB_HOST}}" 
+          value: "{{OPENPAI_CHAT_DB_HOST}}" 
         - name: EPAI_DB_PASSWORD
-          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+          value: "{{OPENPAI_CHAT_DB_PASSWORD}}"
         - name: EPAI_DB_USER
-          value: "{{EPAI_CHAT_DB_USER}}"
+          value: "{{OPENPAI_CHAT_DB_USER}}"
         - name: ES_HOSTS
-          value: "http://epai-es-service.default.svc.cluster.local:9200"
+          value: "http://openpai-es-service.default.svc.cluster.local:9200"
         - name: MINIO_HOST
-          value: "epai-minio-service.default.svc.cluster.local:9000"
+          value: "openpai-minio-service.default.svc.cluster.local:9000"
         - name: MINIO_USER
-          value: "epai"
+          value: "openpai"
         - name: MINIO_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: REDIS_HOST
-          value: "epai-redis-service.default.svc.cluster.local:6379"
+          value: "openpai-redis-service.default.svc.cluster.local:6379"
         - name: REDIS_DB
           value: "1"
         - name: REDIS_PASSWORD
-          value: "epai"
+          value: "openpai"
         - name: MACHINE_CODE
-          value: {{EPAI_CHAT_MACHINE_CODE}}
+          value: {{OPENPAI_CHAT_MACHINE_CODE}}
         - name: EPAI_EVAL_HOST
-          value: "http://epai-eval-service.default.svc.cluster.local:7919"
+          value: "http://openpai-eval-service.default.svc.cluster.local:7919"
         - name: EPAI_MCP_HOST
-          value: "http://epai-mcp-service.default.svc.cluster.local:7920"
+          value: "http://openpai-mcp-service.default.svc.cluster.local:7920"
         - name: ENABLE_VISION_MODEL
-          value: "{{EPAI_ENABLE_VISION_MODEL}}"
+          value: "{{OPENPAI_ENABLE_VISION_MODEL}}"
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
         - name: NODEIP
-          value: "{{EPAI_UI_NODEIP}}"
+          value: "{{OPENPAI_UI_NODEIP}}"
         - name: USER_API_BASE_URL
-          value: "http://{{ALL_EPAI_HOST_IP}}:32101"
+          value: "http://{{ALL_OPENPAI_HOST_IP}}:32101"
         - name: INNER_TOKEN
           value: "9D28C0621CA27CE6ED352ADBE5F208B682DDB8D2796D5FFEEF6A7B39F72D800248B0D94A22B3BFC9085FE21F4EA16232"
         - name: DB_CHAT_SECRET_KEY
@@ -160,9 +161,9 @@ spec:
         - name: DB_CHAT_PRIVATE_KEY
           value: "8454ea67d58f3ba923e724d622b880394377680a55f1bc589d899bc5ed3060d8"
         - name: AGENT_PORTS_START
-          value: "{{EPAI_AGENT_PORTS_START}}"
+          value: "{{OPENPAI_AGENT_PORTS_START}}"
         - name: AGENT_HOSTS
-          value: {{EPAI_AGENT_HOSTS}}
+          value: {{OPENPAI_AGENT_HOSTS}}
         - name: EPAI_WHISPER
           value: "http://llm-rag-predictor-default.default.svc:5050"
         - name: RAG_MODEL_URL
@@ -170,8 +171,8 @@ spec:
         - name: QWEN_MODEL_URL
           value: "http://llm-qwen-predictor-default:5051"
         volumeMounts:
-        - mountPath: /root/.epai
-          name: epai-cache
+        - mountPath: /root/.openpai
+          name: openpai-cache
 
         # 启动探针：最多等240秒
         startupProbe:
@@ -222,16 +223,16 @@ spec:
       - key: CriticalAddonsOnly
         operator: Exists
       volumes:
-      - name: epai-cache
+      - name: openpai-cache
         persistentVolumeClaim:
-          claimName: epai-chat-pvc
+          claimName: openpai-chat-pvc
 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: epaichat-service
+  name: openpaichat-service
   namespace: default
 spec:
   type: ClusterIP
@@ -240,7 +241,7 @@ spec:
     port: 5050
     targetPort: 5050
   selector:
-    app: epaichat
+    app: openpaichat
 
 
 ---
@@ -248,8 +249,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: epai-chat
-  name: epai-chat-pv
+    app: openpai-chat
+  name: openpai-chat-pv
 spec:
   storageClassName: ""
   capacity:
@@ -257,10 +258,10 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:     
-    path: {{EPAI_CHAT_PV_HOST_PATH}}
+    path: {{OPENPAI_CHAT_PV_HOST_PATH}}
   claimRef:
     kind: PersistentVolumeClaim
-    name: epai-chat-pvc
+    name: openpai-chat-pvc
     namespace: default
 
 ---
@@ -268,8 +269,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: epai-chat
-  name: epai-chat-pvc
+    app: openpai-chat
+  name: openpai-chat-pvc
 spec:
   accessModes:
     - ReadWriteMany
@@ -277,57 +278,57 @@ spec:
     requests:
       storage: 2Gi
   storageClassName: ""
-  volumeName: epai-chat-pv
+  volumeName: openpai-chat-pv
 
 
 
 
-# 7、epai-eval 配置
+# 7、openpai-eval 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-eval
+  name: openpai-eval
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: epai-eval
+      app: openpai-eval
   template:
     metadata:
       labels:
-        app: epai-eval
+        app: openpai-eval
     spec:
       containers:
-      - name: epai-eval
-        image: {{EPAI_CHAT_IMAGE}}  
+      - name: openpai-eval
+        image: {{OPENPAI_CHAT_IMAGE}}  
         imagePullPolicy: Always
-        workingDir: /epaichat
+        workingDir: /openpaichat
         command: ["/bin/bash"]
-        args: ["-c", "python eval_server.pyc > /root/epai-eval.log 2>&1"]
+        args: ["-c", "python eval_server.pyc > /root/openpai-eval.log 2>&1"]
         ports:
         - name: eval-model
           containerPort: 7919
         env:
         - name: ASST_CONFIG
-          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}' 
+          value: '{"image":"{{OPENPAI_CHAT_API_IMAGE}}","uiimage":"{{OPENPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{OPENPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{OPENPAI_CHAT_API_CPU}}","memory":"{{OPENPAI_CHAT_API_MEMORY}}","TZ":"{{OPENPAI_TIMEZONE}}","NODEIP":"{{OPENPAI_UI_NODEIP}}"}' 
         - name: EPAI_DB_HOST     
-          value: "{{EPAI_CHAT_DB_HOST}}" 
+          value: "{{OPENPAI_CHAT_DB_HOST}}" 
         - name: EPAI_DB_PASSWORD
-          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+          value: "{{OPENPAI_CHAT_DB_PASSWORD}}"
         - name: EPAI_DB_USER
-          value: "{{EPAI_CHAT_DB_USER}}"
+          value: "{{OPENPAI_CHAT_DB_USER}}"
         - name: ES_HOSTS
-          value: "http://epai-es-service.default.svc.cluster.local:9200"
+          value: "http://openpai-es-service.default.svc.cluster.local:9200"
         - name: MINIO_HOST
-          value: "epai-minio-service.default.svc.cluster.local:9000"
+          value: "openpai-minio-service.default.svc.cluster.local:9000"
         - name: MINIO_USER
-          value: "epai"
+          value: "openpai"
         - name: MINIO_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
       
       dnsPolicy: ClusterFirst
       nodeSelector:
@@ -358,7 +359,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-eval-service
+  name: openpai-eval-service
   namespace: default
 spec:
   type: ClusterIP
@@ -367,58 +368,58 @@ spec:
     port: 7919
     targetPort: 7919
   selector:
-    app: epai-eval
+    app: openpai-eval
 
 
 
-# 8、epai-mcpservers 配置
+# 8、openpai-mcpservers 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-mcp
+  name: openpai-mcp
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: epai-mcp
+      app: openpai-mcp
   template:
     metadata:
       labels:
-        app: epai-mcp
+        app: openpai-mcp
     spec:
       containers:
-      - name: epai-mcp
-        image: {{EPAI_CHAT_IMAGE}}
+      - name: openpai-mcp
+        image: {{OPENPAI_CHAT_IMAGE}}
         imagePullPolicy: Always
-        workingDir: /epaichat
+        workingDir: /openpaichat
         command: ["/bin/bash"]
-        args: ["-lc", "(nohup python start_preset_mcp.pyc > /root/preset_mcp.log 2>&1 &) && python mcp_pod_server.pyc > /root/epai-mcp.log 2>&1"]
+        args: ["-lc", "(nohup python start_preset_mcp.pyc > /root/preset_mcp.log 2>&1 &) && python mcp_pod_server.pyc > /root/openpai-mcp.log 2>&1"]
         ports:
         - name: mcp-model
           containerPort: 7920
         env:
         - name: ASST_CONFIG
-          value: '{"image":"{{EPAI_CHAT_API_IMAGE}}","uiimage":"{{EPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{EPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{EPAI_CHAT_API_CPU}}","memory":"{{EPAI_CHAT_API_MEMORY}}","TZ":"{{EPAI_TIMEZONE}}","NODEIP":"{{EPAI_UI_NODEIP}}"}'
+          value: '{"image":"{{OPENPAI_CHAT_API_IMAGE}}","uiimage":"{{OPENPAI_CHAT_AGENTUI_IMAGE}}","port":8719,"domain":"{{OPENPAI_CHAT_API_DOMAIN}}","namespace":"default","cpu":"{{OPENPAI_CHAT_API_CPU}}","memory":"{{OPENPAI_CHAT_API_MEMORY}}","TZ":"{{OPENPAI_TIMEZONE}}","NODEIP":"{{OPENPAI_UI_NODEIP}}"}'
         - name: EPAI_DB_HOST
-          value: "{{EPAI_CHAT_DB_HOST}}"
+          value: "{{OPENPAI_CHAT_DB_HOST}}"
         - name: EPAI_DB_PASSWORD
-          value: "{{EPAI_CHAT_DB_PASSWORD}}"
+          value: "{{OPENPAI_CHAT_DB_PASSWORD}}"
         - name: EPAI_DB_USER
-          value: "{{EPAI_CHAT_DB_USER}}"
+          value: "{{OPENPAI_CHAT_DB_USER}}"
         - name: ES_HOSTS
-          value: "http://epai-es-service.default.svc.cluster.local:9200"
+          value: "http://openpai-es-service.default.svc.cluster.local:9200"
         - name: MINIO_HOST
-          value: "epai-minio-service.default.svc.cluster.local:9000"
+          value: "openpai-minio-service.default.svc.cluster.local:9000"
         - name: MINIO_USER
-          value: "epai"
+          value: "openpai"
         - name: MINIO_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: MCP_TASK_CONFIG
           value: '{"max_mcp_count":100}'
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
         volumeMounts:
           - mountPath: /mcp
             name: mcp-data
@@ -449,14 +450,14 @@ spec:
       volumes:
       - name: mcp-data
         persistentVolumeClaim:
-          claimName: epai-mcp-pvc
+          claimName: openpai-mcp-pvc
 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-mcp-service
+  name: openpai-mcp-service
   namespace: default
 spec:
   type: ClusterIP
@@ -465,26 +466,26 @@ spec:
     port: 7920
     targetPort: 7920
   selector:
-    app: epai-mcp
+    app: openpai-mcp
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: epai-mcp
-  name: epai-mcp-pv
+    app: openpai-mcp
+  name: openpai-mcp-pv
 spec:
   storageClassName: ""
   capacity:
-    storage: {{EPAI_MCP_PV_STORAGE}}
+    storage: {{OPENPAI_MCP_PV_STORAGE}}
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: {{EPAI_MCP_PV_HOST_PATH}}
+    path: {{OPENPAI_MCP_PV_HOST_PATH}}
   claimRef:
     kind: PersistentVolumeClaim
-    name: epai-mcp-pvc
+    name: openpai-mcp-pvc
     namespace: default
 
 ---
@@ -492,65 +493,65 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: epai-mcp
-  name: epai-mcp-pvc
+    app: openpai-mcp
+  name: openpai-mcp-pvc
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{EPAI_MCP_PV_STORAGE}}
+      storage: {{OPENPAI_MCP_PV_STORAGE}}
   storageClassName: ""
-  volumeName: epai-mcp-pv
+  volumeName: openpai-mcp-pv
 
 
 ---
-# 3、epai-parser
+# 3、openpai-parser
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    label: epai-parser
-  name: epai-parser
+    label: openpai-parser
+  name: openpai-parser
   namespace: default
 spec:
-  serviceName: epaiparser
-  replicas: {{EPAI_PARSER_REPLICAS}}
+  serviceName: openpaiparser
+  replicas: {{OPENPAI_PARSER_REPLICAS}}
   selector:
     matchLabels:
-      app: epai-parser
+      app: openpai-parser
   template:
     metadata:
       labels:
-        app: epai-parser
+        app: openpai-parser
     spec:
       terminationGracePeriodSeconds: 0
       containers:
       - env:
         - name: ES_HOSTS
-          value: "http://epai-es-service.default.svc.cluster.local:9200"
+          value: "http://openpai-es-service.default.svc.cluster.local:9200"
         - name: MINIO_HOST
-          value: "epai-minio-service.default.svc.cluster.local:9000"
+          value: "openpai-minio-service.default.svc.cluster.local:9000"
         - name: MINIO_USER
-          value: "epai"
+          value: "openpai"
         - name: MINIO_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: REDIS_HOST
-          value: "epai-redis-service.default.svc.cluster.local:6379"
+          value: "openpai-redis-service.default.svc.cluster.local:6379"
         - name: REDIS_DB
           value: "1"
         - name: REDIS_PASSWORD
-          value: "epai"
+          value: "openpai"
         - name: EPAICHAT
-          value: "http://epaichat-service.default.svc.cluster.local:5050"
+          value: "http://openpaichat-service.default.svc.cluster.local:5050"
         - name: ENABLE_VISION_MODEL
-          value: "{{EPAI_ENABLE_VISION_MODEL}}"
+          value: "{{OPENPAI_ENABLE_VISION_MODEL}}"
         - name: MINERU_MIN_EPOCH_SIZE
-          value: "{{EPAI_PARSER_EPOCH_SIZE}}"
+          value: "{{OPENPAI_PARSER_EPOCH_SIZE}}"
         - name: PARSER_BATCHSIZE
           value: "1"
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -558,14 +559,14 @@ spec:
               fieldPath: metadata.name
         resources: 
           limits:
-            cpu: {{EPAI_PARSER_LIMITS_CPU}}
+            cpu: {{OPENPAI_PARSER_LIMITS_CPU}}
             memory: "48Gi"
           requests:
-            cpu: {{EPAI_PARSER_LIMITS_CPU}}
+            cpu: {{OPENPAI_PARSER_LIMITS_CPU}}
             memory: "48Gi"
-        image: {{EPAI_PARSER_IMAGE}}
+        image: {{OPENPAI_PARSER_IMAGE}}
         imagePullPolicy: Always
-        name: epai-parser
+        name: openpai-parser
         ports:
         - containerPort: 5555
           protocol: TCP
@@ -573,7 +574,7 @@ spec:
           privileged: false
       dnsPolicy: ClusterFirst
       nodeSelector:
-        inf_use: "{{EPAI_PARSER_NODE_SELECTOR}}"
+        inf_use: "{{OPENPAI_PARSER_NODE_SELECTOR}}"
       restartPolicy: Always
       tolerations:
       - effect: NoExecute
@@ -597,17 +598,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-parser-service
+  name: openpai-parser-service
   namespace: default
   labels:
-    app: epai-parser
+    app: openpai-parser
 spec:
   ports:
-    - name: epai-parser
+    - name: openpai-parser
       port: 5555
       protocol: TCP
   selector:
-    app: epai-parser
+    app: openpai-parser
   type: ClusterIP
 
 
@@ -620,12 +621,12 @@ spec:
 ###    部署
 ##################################
 
-# 4. epai-es 配置
+# 4. openpai-es 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-es
+  name: openpai-es
   namespace: default
 spec:
   replicas: 1
@@ -639,7 +640,7 @@ spec:
     spec:
       containers:
       - name: elasticsearch
-        image: {{EPAI_ES_IMAGE}}
+        image: {{OPENPAI_ES_IMAGE}}
         imagePullPolicy: Always
         ports:
         - containerPort: 9200
@@ -647,11 +648,11 @@ spec:
         - name: node.name   
           value: "node1"
         - name: cluster.name
-          value: "epai"
+          value: "openpai"
         - name: cluster.initial_master_nodes
           value: "node1"
         - name: ELASTIC_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: bootstrap.memory_lock
           value: "false"
         - name: xpack.security.enabled
@@ -659,7 +660,7 @@ spec:
         - name: cluster.max_shards_per_node
           value: "4096"
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data
           name: es-data
@@ -697,7 +698,7 @@ spec:
       volumes:
       - name: es-data
         persistentVolumeClaim:
-          claimName: epai-es-pvc
+          claimName: openpai-es-pvc
       - name: es-config-volume
         configMap:
           name: es-config
@@ -721,12 +722,12 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-es-service
+  name: openpai-es-service
   namespace: default
 spec:
   type: ClusterIP
   ports:
-  - name: epai-es
+  - name: openpai-es
     port: 9200
     targetPort: 9200
   selector:
@@ -737,19 +738,19 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: epai-es
-  name: epai-es-pv
+    app: openpai-es
+  name: openpai-es-pv
 spec:
   storageClassName: ""
   capacity:
-    storage: {{EPAI_ES_PV_STORAGE}}   
+    storage: {{OPENPAI_ES_PV_STORAGE}}   
   accessModes:
     - ReadWriteMany
   hostPath: 
-    path: {{EPAI_ES_PV_HOST_PATH}}
+    path: {{OPENPAI_ES_PV_HOST_PATH}}
   claimRef:
     kind: PersistentVolumeClaim
-    name: epai-es-pvc
+    name: openpai-es-pvc
     namespace: default
 
 ---
@@ -757,24 +758,24 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: epai-es
-  name: epai-es-pvc
+    app: openpai-es
+  name: openpai-es-pvc
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{EPAI_ES_PV_STORAGE}}
+      storage: {{OPENPAI_ES_PV_STORAGE}}
   storageClassName: ""
-  volumeName: epai-es-pv
+  volumeName: openpai-es-pv
 
 
-# 5. redis-epai 配置
+# 5. redis-openpai 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-redis
+  name: openpai-redis
   namespace: default
 spec:
   replicas: 1
@@ -788,14 +789,14 @@ spec:
     spec:
       containers:
       - name: redis
-        image: {{EPAI_REDIS_IMAGE}}
+        image: {{OPENPAI_REDIS_IMAGE}}
         imagePullPolicy: Always
         ports:
         - containerPort: 6379
         env:
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
-        command: ["redis-server", "--requirepass", "epai", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+          value: "{{OPENPAI_TIMEZONE}}"
+        command: ["redis-server", "--requirepass", "openpai", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
         volumeMounts:
         - mountPath: /data
           name: redis-data
@@ -823,13 +824,13 @@ spec:
       volumes:
       - name: redis-data
         persistentVolumeClaim:
-            claimName: epai-redis-pvc
+            claimName: openpai-redis-pvc
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-redis-service
+  name: openpai-redis-service
   namespace: default
 spec:
   type: ClusterIP
@@ -846,8 +847,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: epai-redis
-  name: epai-redis-pv
+    app: openpai-redis
+  name: openpai-redis-pv
 spec:
   storageClassName: ""
   capacity:
@@ -855,10 +856,10 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:  
-    path: {{EPAI_REDIS_PV_HOST_PATH}}
+    path: {{OPENPAI_REDIS_PV_HOST_PATH}}
   claimRef:
     kind: PersistentVolumeClaim
-    name: epai-redis-pvc
+    name: openpai-redis-pvc
     namespace: default
 
 ---
@@ -866,8 +867,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: epai-redis
-  name: epai-redis-pvc
+    app: openpai-redis
+  name: openpai-redis-pvc
 spec:
   accessModes:
     - ReadWriteMany
@@ -875,16 +876,16 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: ""
-  volumeName: epai-redis-pv
+  volumeName: openpai-redis-pv
 
 
 
-# 6. minio-epai 配置
+# 6. minio-openpai 配置
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epai-minio
+  name: openpai-minio
   namespace: default
 spec:
   replicas: 1
@@ -898,18 +899,18 @@ spec:
     spec:
       containers:
       - name: minio
-        image: {{EPAI_MINIO_IMAGE}}
+        image: {{OPENPAI_MINIO_IMAGE}}
         imagePullPolicy: Always
         ports:
         - containerPort: 9000
         - containerPort: 9001
         env:
         - name: MINIO_ROOT_USER
-          value: "epai"
+          value: "openpai"
         - name: MINIO_ROOT_PASSWORD
-          value: "epaichat"
+          value: "openpaichat"
         - name: TZ
-          value: "{{EPAI_TIMEZONE}}"
+          value: "{{OPENPAI_TIMEZONE}}"
         command: ["minio", "server", "--console-address", ":9001", "/data"]
         volumeMounts:
         - mountPath: /data
@@ -938,14 +939,14 @@ spec:
       volumes:
       - name: minio-data
         persistentVolumeClaim:
-          claimName: epai-minio-pvc
+          claimName: openpai-minio-pvc
 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: epai-minio-service
+  name: openpai-minio-service
   namespace: default
 spec:
   type: ClusterIP
@@ -965,19 +966,19 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    app: epai-minio
-  name: epai-minio-pv
+    app: openpai-minio
+  name: openpai-minio-pv
 spec:
   storageClassName: ""
   capacity:
-    storage: {{EPAI_MINIO_PV_STORAGE}} 
+    storage: {{OPENPAI_MINIO_PV_STORAGE}} 
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: {{EPAI_MINIO_PV_HOST_PATH}}
+    path: {{OPENPAI_MINIO_PV_HOST_PATH}}
   claimRef:
     kind: PersistentVolumeClaim
-    name: epai-minio-pvc
+    name: openpai-minio-pvc
     namespace: default
 
 ---
@@ -985,13 +986,13 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: epai-minio
-  name: epai-minio-pvc
+    app: openpai-minio
+  name: openpai-minio-pvc
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{EPAI_MINIO_PV_STORAGE}}
+      storage: {{OPENPAI_MINIO_PV_STORAGE}}
   storageClassName: ""
-  volumeName: epai-minio-pv
+  volumeName: openpai-minio-pv
