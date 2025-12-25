@@ -303,7 +303,7 @@ spec:
       - name: openpai-eval
         image: {{OPENPAI_CHAT_IMAGE}}  
         imagePullPolicy: Always
-        workingDir: /epaichat
+        workingDir: /openpaichat
         command: ["/bin/bash"]
         args: ["-c", "python eval_server.pyc > /root/openpai-eval.log 2>&1"]
         ports:
@@ -392,7 +392,7 @@ spec:
       - name: openpai-mcp
         image: {{OPENPAI_CHAT_IMAGE}}
         imagePullPolicy: Always
-        workingDir: /epaichat
+        workingDir: /openpaichat
         command: ["/bin/bash"]
         args: ["-lc", "(nohup python start_preset_mcp.pyc > /root/preset_mcp.log 2>&1 &) && python mcp_pod_server.pyc > /root/openpai-mcp.log 2>&1"]
         ports:
