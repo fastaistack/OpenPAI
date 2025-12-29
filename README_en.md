@@ -28,12 +28,6 @@
 - **Administrator**: Access advanced settings, manage users, model connections, agents, resourcesand datas.
 - **Standard User**: Engage in LLM conversations, adjust user preferences, and manage personal agents and datas.
 
-### 🌐 **Connect to Various Model Sources**
-- Integrate with **OpenStation**-deployed model services.
-- Import 3rd-party model endpoints.
-- Refresh or disable certain model connections as needed.
-
-
 ### 🛠️**manage agents, datas**
 - 🔧manage agents, eval-tasks, prompts
 - 🖥️manage datas, including knowledge-bases, databases, profession lexicons
