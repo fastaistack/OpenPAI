@@ -39,16 +39,20 @@
 ## 📦 安装与部署
 本项目主要采用K8s部署的方式，请先部署一个k8s在机器上。后续会完善docker部署方式。
 
-**环境：**
+整体安装部署思路是：**环境准备 → 拉镜像 → 准备模型 → 部署（部署数据库 → 部署 Chat → 部署 LLM-Serving)**。
+
+### 一、环境准备：
 
 ```
 1、系统：       ubuntu
 2、部署:        Kubernetes
 ```
 
+请准备至少 1 台机器（支持多节点更佳），已安装并可正常使用：docker、kubectl、kubernetes集群（k8s）。
 
+### 二、拉镜像：
 
-### 一、镜像：
+#### 2.1 主节点拉取镜像
 
 通过如下命令拉取镜像：
 
@@ -78,6 +82,8 @@ LLM-Serving需要拉取如下1个镜像：
 llm-serving:8.0
 ```
 
+#### 2.2 多节点情况（如无其他节点可忽略）
+
 拉取完成后，如果机器有多个节点，需要在**每个节点**拉取apiserver、agentui和openpaiparser的镜像，例如，除了主节点外还有一个node2节点：
 
 ```shell
@@ -95,15 +101,23 @@ docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaiparser:v
 
 
 
-### 二、模型：
+### 三、准备模型：
 
-首先，先规划一下要将模型放置到哪个节点**（建议有足够CPU和GPU资源，主要用于部署模型）**，然后在该节点下执行如下操作：
+#### 3.1 选择部署节点
+
+规划一下要将模型放置到哪个节点，**建议有足够CPU和GPU资源，主要用于部署模型**。
+
+#### 3.2 拉取模型镜像
+
+在该节点下执行如下操作：
 
 拉取模型镜像：
 
 ```shell
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-model:latest
 ```
+
+#### 3.3 拷贝模型文件
 
 拷贝模型文件到对应节点任意路径下：
 
@@ -125,6 +139,8 @@ vl-models.tar.gz
 whisper-models.tar.gz
 ```
 
+#### 3.4 解压模型文件
+
 将这5个压缩包分别解压：
 
 ```shell
@@ -135,10 +151,12 @@ tar -xf <TAR-PACKAGE>
 
 
 
-### 三、部署：
-### 数据库部署：
+### 四、部署：
+#### 4.1 部署数据库：
 
-如果机器上已有数据库，可以直接使用原来的数据库，并在数据库中执行如下命令创建用户并给予权限，可根据实际情况修改用户名和密码：
+##### 4.1.1 方式一：使用已有数据库
+
+如果机器上已有数据库，可以直接使用原来的数据库，并在在已有 MySQL / MariaDB 中执行如下SQL命令创建用户并给予权限，可根据实际情况修改用户名和密码：
 
 ```mysql
 create user 'openpaiadmin' identified by 'OPENPAIChat';
@@ -147,6 +165,7 @@ grant all privileges on openpaichat.* to openpaiadmin@'%';
 flush privileges;
 ```
 
+##### 4.1.2 方式二：使用 Docker 启动 MariaDB
 
 如果没有数据库，建议直接拉取最新的**mariadb镜像**，拉取及启动命令示例(可根据实际情况修改)：
 
@@ -160,24 +179,33 @@ docker run -d \
   mariadb:latest
 ```
 
+#### 4.2 部署Chat：
 
-#### Chat部署：
+##### 4.2.1 准备部署文件
 
 chat部署的yaml文件在项目的**deploymnet/k8s/chat**目录下，先将其单独拷贝出来放到**主节点**任意目录下，然后cd到该目录下执行如下操作：
 
-1、根据实际情况修改**openpai_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改
+##### 4.2.2 修改配置文件
 
-2、替换主部署文件**all-openpai-deployment.yml**：
+根据实际情况修改**openpai_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改
+
+##### 4.2.3 创建数据目录
+
+主节点上任意路径（用来持久化存储和存放日志信息）下，建好如下4个文件夹：**cache**（存放日志）、**mcp_data**、**es_data**（给予777权限：**chmod 777  HOST_PATH/es_data**）、**redis_data**和**minio_data**。
+
+##### 4.2.4 执行替换脚本
 
 **如下脚本主要用于替换all-openpai-deployment.yml中的值，如果不需要或有问题，可以根据实际情况手动指定all-openpai-deployment.yml中的部署方式（4个文件夹要建好并给与权限）。**
 
-执行**replace.sh**脚本将**all-openpai-deployment.yml**文件中值替换为**openpai_config.yml**中配置的值，其中第一个参数为**主节点的IP**，第二个参数为**主节点**上任意路径（用来持久化存储和存放日志信息），并在该路径下建好如下4个文件夹：**cache**（存放日志）、**mcp_data**、**es_data**（给予777权限：**chmod 777  HOST_PATH/es_data**）、**redis_data**和**minio_data**。
+执行**replace.sh**脚本将**all-openpai-deployment.yml**文件中值替换为**openpai_config.yml**中配置的值，其中第一个参数为**主节点的IP**，第二个参数为创建的数据目录。
 
 ```shell
 bash +x replace.sh 10.11.12.13 <HOST_PATH>
 ```
 
-3、替换完成后，直接部署：
+##### 4.2.5 部署chat服务
+
+替换完成后，直接部署：
 
 ```shell
 kubectl apply -f all-openpai-deployment.yml
@@ -185,17 +213,21 @@ kubectl apply -f all-openpai-deployment.yml
 
 
 
-#### LLM-Serving部署：
+#### 4.3 部署LLM-Serving：
+
+##### 4.3.1 准备部署文件
 
 LLM-Serving部署的yaml文件在项目的**deploymnet/k8s/LLM-Serving**目录下，先将其单独拷贝出来放到**主节点**任意目录下。
 
-1、根据实际情况修改**llm-serving_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改;
+##### 4.3.2 修改配置文件
 
-2、替换LLM-Serving主yaml: 
+根据实际情况修改**llm-serving_config.yml**文件中的值：其中**{{HOST_IP}}**和**{{HOST_PATH}}**通过后面步骤的脚本传递参数整体修改;
 
 如果是**CPU部署LLM-Serving**服务，请先在**llm-serving.yml**中将请求和限制的GPU资源**“nvidia.com/gpu: 1”**注释掉或者删除；
 
 如果是**GPU部署LLM-Serving**服务，请先在**llm-serving.yml**中将环境变量**NVIDIA_VISIBLE_DEVICES及其值**注释掉或者删除。
+
+##### 4.3.3 执行替换脚本
 
 **如下脚本主要用于替换llm-serving.yml中的值，如果不需要或有问题，可以根据实际情况手动指定llm-serving.yml中的部署方式。**
 
@@ -211,7 +243,9 @@ bash +x replace-llm-serving-yaml.sh <HOST_IP> <HOST_PATH>
 bash +x replace-llm-serving-yaml.sh 172.16.0.128 /home/model
 ```
 
-3、如果是**CPU部署LLM-Serving**服务，请先执行如下命令：
+##### 4.3.4 修改模型部署配置
+
+如果是**CPU部署LLM-Serving**服务，请先执行如下命令：
 
 ```shell
 cp Param-rag-cpu.yaml Param-rag.yaml
@@ -241,7 +275,9 @@ bash +x replace-rag-param.sh /home/model
 cp Param-rag.yaml <HOST_PATH>/bussiness/
 ```
 
-完成后，直接部署：
+##### 4.3.4 部署LLM-Serving
+
+修改完成后，直接部署：
 
 ```shell
 kubectl apply -f llm-serving.yml
