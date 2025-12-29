@@ -121,11 +121,11 @@ The knowledge base management feature is available to system administrators. In 
 
 ![Knowledge Base](../doc/images/v1.0/knowledge/admin_kb_list_en.png)
 
-#### 1.5.1 Knowledge Base List
+##### 1.5.1.1 Knowledge Base List
 
 The Knowledge Base List page displays all knowledge bases on the platform. It supports search and filtering by knowledge base type, language, and name. Sorting in ascending or descending order is supported by name, creation time, quantity, and size. Knowledge bases can be shared, transferred, scaled up or down, and deleted, and all of these operations support batch actions.
 
-#### 1.5.2 Knowledge Base Sharing
+##### 1.5.1.2 Knowledge Base Sharing
 
 Through the knowledge base sharing operation, a knowledge base can be shared with other users or user groups.
 
@@ -139,7 +139,7 @@ Sharing supports batch operations. On the list page, you can select multiple kno
 
 After the sharing operation takes effect, the shared users or members of shared user groups can view the corresponding knowledge bases under Knowledge Base - Shared by Others. They can also view the corresponding knowledge bases through the Knowledge Base List, and see their permission scope for each knowledge base based on the sharing permissions.
 
-#### 1.5.3 Knowledge Base Permission Transfer
+##### 1.5.1.3 Knowledge Base Permission Transfer
 
 Through the knowledge base permission transfer operation, knowledge bases created by a user can be transferred to other users. Batch transfer is also supported.
 
@@ -147,11 +147,11 @@ After entering the knowledge base permission transfer page, you can select a use
 
 After the transfer operation takes effect, the target user can view the corresponding knowledge base under the Knowledge Directory. The transfer function does not affect the original sharing scope of the knowledge base. That is, if a knowledge base has been shared with other users before being transferred, the access permissions of those users will remain unchanged.
 
-#### 1.5.4 Knowledge Base Capacity Scaling
+##### 1.5.1.4 Knowledge Base Capacity Scaling
 
 Knowledge base capacity scaling allows capacity control for a single knowledge base. By default, a single knowledge base allows uploading up to 500 files. Administrator users can apply different capacity limits to different knowledge bases, with a capacity range of 200 to 1000. Administrator users can also perform batch capacity scaling for multiple knowledge bases.
 
-#### 1.5.5 Delete Knowledge Base
+##### 1.5.1.5 Delete Knowledge Base
 
 Administrator users can delete all knowledge bases except built-in knowledge bases. Please note that deleting a knowledge base will delete both the knowledge base itself and all documents within it. Therefore, please delete knowledge bases with caution.
 
@@ -179,7 +179,7 @@ On the home page, click the `Professional Lexicon` submenu under **Data** to ent
 
 ![](../doc/images/v1.0/admin/lexicon_list_en.png)
 
-#### 1.5.3.1 Lexicon Sharing
+##### 1.5.3.1 Lexicon Sharing
 
 You can share lexicons with other users or user groups through the lexicon sharing feature.
 
@@ -188,14 +188,14 @@ You can share lexicons with other users or user groups through the lexicon shari
 - Batch sharing is supported: on the list page, select multiple lexicons and click the **“Share”** button to enter the sharing page. When performing batch sharing, all existing sharing records of the selected lexicons will be cleared and replaced by the latest sharing configuration. Please pay attention to this behavior when using batch sharing.
 - After the sharing operation takes effect, all shared users or members of shared user groups can see the corresponding lexicons in the Professional Lexicon module.
 
-#### 1.5.3.2 Lexicon Ownership Transfer
+##### 1.5.3.2 Lexicon Ownership Transfer
 
 You can transfer professional lexicons created by a user to another user through the lexicon ownership transfer feature. Batch transfer is also supported.
 
 - After entering the lexicon ownership transfer page, you can select a target user from the user list, or search by name and select a user from the search results for transfer.
 - Once the transfer takes effect, the target user can view the corresponding professional lexicons. The transfer will not affect the original sharing scope of the lexicons; that is, if a lexicon has already been shared with other users, transferring its ownership will not affect other users’ permissions to view or use the lexicon.
 
-#### 1.5.3.4 Lexicon Deletion
+##### 1.5.3.3 Lexicon Deletion
 
 Administrator users can delete any professional lexicons, supporting both single and batch deletion.
 
