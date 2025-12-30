@@ -220,6 +220,10 @@ System settings include two tabs: business configuration and page configuration.
 
 ##### Business Config
 
+The business config mainly focuses on better resource allocation and efficient use of the system for core business operations. Configurable modules include: Chats, KBase, Black/White List, App Eval, and Log Manager.
+
+![](../doc/images/v1.0/admin/setting-en.jpg)
+
 ##### Page Config
 Page configuration primarily involves flexible configuration of the system to meet the personalized needs of various systems. It mainly involves configuring the browser title name, product logo, homepage logo, etc., which can be modified or reset.
 ![](../doc/images/v1.0/admin/web_config_en.png)
