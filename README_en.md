@@ -51,7 +51,7 @@ This project primarily uses **Kubernetes (K8s)** for deployment. Docker-based de
 ### Hardware Requirements
 
 - **Recommended configuration**:
-  - CPU: 30 cores
+  - CPU: 50 cores
   - Memory: 90 GB
   - GPU (NVIDIA): 1 × (≥ 60 GB VRAM)
   - Disk: 170 GB
