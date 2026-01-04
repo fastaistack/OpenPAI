@@ -24,25 +24,33 @@
 
 ## 📦 Installation & Deployment
 
-This project is mainly deployed using **Kubernetes (K8s)**. Please deploy a Kubernetes cluster on your machines first. A Docker-only deployment method will be improved and provided later.
+The following **installation and deployment steps** are all **command-line operations** performed on the server. Beginners should proceed with caution.
 
-The overall installation and deployment workflow is as follows:
- **Environment Preparation → Pull Images → Prepare Models → Deployment (Database → Chat → LLM-Serving)**
+The overall installation and deployment workflow is:
+ **Environment preparation → Pull images → Prepare models → Deployment (deploy database → deploy Chat → deploy LLM-Serving)**.
 
 ------
 
 ## I. Environment Preparation
 
-```
-1. Operating System:  Ubuntu
-2. Deployment:        Kubernetes
-```
+This project primarily uses **Kubernetes (K8s)** for deployment. Docker-based deployment will be improved in the future.
+ Please prepare at least **one machine** (multi-node setup is recommended).
 
-Please prepare at least **one machine** (multi-node setups are recommended) with the following components installed and working properly:
+### Hardware Requirements
 
-- Docker
-- kubectl
-- A Kubernetes cluster (K8s)
+- **Recommended configuration**:
+  - CPU: 50 cores
+  - Memory: 90 GB
+  - GPU (NVIDIA): 1 × (≥ 60 GB VRAM)
+  - Disk: 170 GB
+
+### Software Requirements
+
+- Operating System: **Ubuntu 22.04.2 LTS**
+- Required tools:
+  - Docker: 24.0.9
+  - Kubernetes: 1.20.5
+  - Kubectl: 1.20.5
 
 ------
 
@@ -56,11 +64,10 @@ Use the following command to pull images:
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<IMAGE-TAG>
 ```
 
-Where `<IMAGE-NAME>:<IMAGE-TAG>` represents the image name and tag.
+Here, `<IMAGE-NAME>:<IMAGE-TAG>` represents the image name and tag.
+ The required images are divided into **Chat images** and **LLM-Serving images**.
 
-The required images are divided into **Chat images** and **LLM-Serving images**, listed as follows.
-
-#### Chat Images (9 images required):
+The **Chat** service requires the following 9 images:
 
 ```
 openpaichat:v1.0
@@ -74,7 +81,7 @@ docker.elastic.co/elasticsearch/elasticsearch:8.11.3
 busybox:1.31.0
 ```
 
-#### LLM-Serving Image (1 image required):
+The **LLM-Serving** service requires the following image:
 
 ```
 llm-serving:8.0
@@ -82,18 +89,18 @@ llm-serving:8.0
 
 ------
 
-### 2.2 Multi-Node Scenario (Skip if Single Node)
+### 2.2 Multi-node Scenario (Skip if Not Applicable)
 
-After pulling the images, if your cluster has multiple nodes, you must pull the **apiserver**, **agent-ui**, and **openpaiparser** images on **each node**.
+After pulling images, if you have multiple nodes, you must pull the **apiserver**, **agent-ui**, and **openpaiparser** images on **each node**.
 
-For example, if there is another node named `node2`:
+For example, if there is an additional node named `node2`:
 
 ```
 ssh node2
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/<IMAGE-NAME>:<IMAGE-TAG>
 ```
 
-Example commands (adjust according to your environment, e.g. when using Harbor):
+Example:
 
 ```
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/apiserver:v1.1
@@ -105,16 +112,14 @@ docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpaiparser:v
 
 ## III. Prepare Models
 
-### 3.1 Choose the Deployment Node
+### 3.1 Select the Deployment Node
 
-Plan which node will store and serve the models.
- It is **recommended to choose a node with sufficient CPU and GPU resources**, as this node will be used to deploy the models.
-
-------
+Plan which node will store the models.
+ It is **recommended to choose a node with sufficient CPU and GPU resources**, as it will primarily be used for model deployment.
 
 ### 3.2 Pull the Model Image
 
-Run the following command on the selected node:
+On the selected node, execute the following command to pull the model image:
 
 ```
 docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-model:latest
@@ -124,7 +129,7 @@ docker pull easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-mod
 
 ### 3.3 Copy Model Files
 
-Copy the model files to any directory on the selected node:
+Copy the model files to any directory on the target node:
 
 ```
 docker create --name <CONTAINER-NAME> easyds-registry.cn-beijing.cr.aliyuncs.com/faststack/openpai-rag-model:latest
@@ -132,11 +137,12 @@ docker cp <CONTAINER-NAME>:/model/bussiness <HOST_PATH>
 docker rm -f <CONTAINER-NAME>
 ```
 
-- `<CONTAINER-NAME>`: temporary container name
-- `<HOST_PATH>`: target path on the node used to store model files
+Where:
 
-After copying, a **bussiness** directory will appear under `<HOST_PATH>`.
- Inside this directory, there will be five compressed files:
+- `<CONTAINER-NAME>` is the container name
+- `<HOST_PATH>` is the path on the node used to store the model files
+
+After copying, a **bussiness** directory will appear at the target path, containing the following five compressed files:
 
 ```
 custom-models.tar.gz
@@ -150,13 +156,13 @@ whisper-models.tar.gz
 
 ### 3.4 Extract Model Files
 
-Extract each compressed package:
+Extract each of the five compressed files:
 
 ```
 tar -xf <TAR-PACKAGE>
 ```
 
-Where `<TAR-PACKAGE>` is the name of each archive file.
+Where `<TAR-PACKAGE>` is the name of the compressed file.
  After extraction, five corresponding directories will be created.
 
 ------
@@ -167,8 +173,8 @@ Where `<TAR-PACKAGE>` is the name of each archive file.
 
 #### 4.1.1 Option 1: Use an Existing Database
 
-If a database already exists, you can use it directly.
- Execute the following SQL commands in your existing **MySQL / MariaDB** instance to create a user and grant permissions (adjust username and password as needed):
+If a database already exists on the machine, you can use it directly.
+ Execute the following SQL commands in an existing **MySQL / MariaDB** instance to create a user and grant permissions (modify the username and password as needed):
 
 ```
 create user 'openpaiadmin' identified by 'OPENPAIChat';
@@ -181,7 +187,9 @@ flush privileges;
 
 #### 4.1.2 Option 2: Start MariaDB Using Docker
 
-If no database is available, it is recommended to pull and run the latest **MariaDB** image:
+If no database is available, it is recommended to pull and run the latest **MariaDB image**.
+
+Example commands (adjust as needed):
 
 ```
 docker pull mariadb:latest
@@ -199,40 +207,52 @@ docker run -d \
 
 #### 4.2.1 Prepare Deployment Files
 
-The Chat deployment YAML files are located in the **deploymnet/k8s/chat** directory of the project.
+The Chat deployment YAML files are located in the project directory:
+ `deploymnet/k8s/chat`
 
-Copy this directory to any location on the **master node**, then change into that directory to continue.
+Clone the project and copy this directory to any path on the **master node**:
+
+```
+git clone https://github.com/fastaistack/OpenPAI.git
+cp -r OpenPAI/deploymnet/k8s/chat <HOST_PATH>
+```
 
 ------
 
-#### 4.2.2 Modify Configuration File
+#### 4.2.2 Modify Configuration Files
 
-Edit the **openpai_config.yml** file according to your environment.
- The values **{{HOST_IP}}** and **{{HOST_PATH}}** will be automatically replaced by a script in later steps.
+Modify the values in the **openpai_config.yml** file according to your environment.
+ The placeholders **{{HOST_IP}}** and **{{HOST_PATH}}** can be ignored.
 
 ------
 
 #### 4.2.3 Create Data Directories
 
-On the master node, choose any path for persistent storage and logs, and create the following directories:
+On the master node, create the following directories under any path (used for persistent storage and logs):
 
 - `cache` (for logs)
 - `mcp_data`
-- `es_data` (set permissions to 777: `chmod 777 HOST_PATH/es_data`)
+- `es_data` (must have `777` permissions)
 - `redis_data`
 - `minio_data`
 
+```
+cd <HOST_PATH>
+mkdir cache && mkdir mcp_data && mkdir es_data && mkdir redis_data && mkdir minio_data
+chmod 777 es_data
+```
+
 ------
 
-#### 4.2.4 Run the Replacement Script
+#### 4.2.4 Execute the Replacement Script
 
-> The following script is used to replace values in `all-openpai-deployment.yml`.
->  If you prefer, you may manually configure the deployment file instead (ensure all directories exist and have proper permissions).
+The following script is used to replace values in `all-openpai-deployment.yml`.
+ You may also manually configure the deployment method in `all-openpai-deployment.yml` (ensure the four directories exist and have proper permissions).
 
-Run the **replace.sh** script.
+Run the **replace.sh** script to replace values in `all-openpai-deployment.yml` with those from `openpai_config.yml`.
 
-- First parameter: master node IP
-- Second parameter: data directory path
+- First parameter: **master node IP**
+- Second parameter: **data directory path**
 
 ```
 bash +x replace.sh 10.11.12.13 <HOST_PATH>
@@ -242,7 +262,7 @@ bash +x replace.sh 10.11.12.13 <HOST_PATH>
 
 #### 4.2.5 Deploy the Chat Service
 
-After replacement, deploy the Chat service:
+After replacement, deploy directly:
 
 ```
 kubectl apply -f all-openpai-deployment.yml
@@ -254,41 +274,39 @@ kubectl apply -f all-openpai-deployment.yml
 
 #### 4.3.1 Prepare Deployment Files
 
-The LLM-Serving deployment YAML files are located in **deploymnet/k8s/LLM-Serving**.
- Copy this directory to any location on the **master node**.
+The LLM-Serving deployment YAML files are located in:
+ `deploymnet/k8s/LLM-Serving`
+
+Clone the project and copy this directory to any path on the **master node**:
+
+```
+git clone https://github.com/fastaistack/OpenPAI.git
+cp -r OpenPAI/deploymnet/k8s/deploymnet/k8s/LLM-Serving <HOST_PATH>
+```
 
 ------
 
-#### 4.3.2 Modify Configuration File
+#### 4.3.2 Modify Configuration Files
 
-Edit **llm-serving_config.yml** according to your environment.
- The values **{{HOST_IP}}** and **{{HOST_PATH}}** will be replaced by a script later.
+Modify the values in **llm-serving_config.yml** according to your environment.
+ The placeholders **{{HOST_IP}}** and **{{HOST_PATH}}** can be ignored.
 
-- **CPU deployment**:
-   Comment out or remove the GPU resource request/limit
-
-  ```
-  nvidia.com/gpu: 1
-  ```
-
-- **GPU deployment**:
-   Comment out or remove the environment variable
-
-  ```
-  NVIDIA_VISIBLE_DEVICES
-  ```
+- For **CPU-based LLM-Serving deployment**:
+   Comment out or remove the GPU resource requests and limits
+   `nvidia.com/gpu: 1` in `llm-serving.yml`.
+- For **GPU-based LLM-Serving deployment**:
+   Comment out or remove the environment variable `NVIDIA_VISIBLE_DEVICES` and its value in `llm-serving.yml`.
 
 ------
 
-#### 4.3.3 Run the Replacement Script
+#### 4.3.3 Execute the Replacement Script
 
-> This script replaces values in `llm-serving.yml`.
->  If not needed, you may manually configure the file instead.
+This script replaces values in `llm-serving.yml`. You may also manually configure it as needed.
 
-Run the script with:
+Run the **replace-llm-serving-yaml.sh** script:
 
 - First parameter: master node IP
-- Second parameter: path to the extracted **bussiness** model directory
+- Second parameter: path to the extracted LLM-Serving model **bussiness** directory (on the target node)
 
 ```
 bash +x replace-llm-serving-yaml.sh <HOST_IP> <HOST_PATH>
@@ -304,31 +322,31 @@ bash +x replace-llm-serving-yaml.sh 172.16.0.128 /home/model
 
 #### 4.3.4 Modify Model Deployment Configuration
 
-- **CPU deployment**:
+- For **CPU-based LLM-Serving**:
 
 ```
 cp Param-rag-cpu.yaml Param-rag.yaml
 ```
 
-- **GPU deployment**:
+- For **GPU-based LLM-Serving**:
 
 ```
 cp Param-rag-gpu.yaml Param-rag.yaml
 ```
 
-Then update the paths in `Param-rag.yaml` (or edit manually):
+Then modify the paths in `Param-rag.yaml` using the following command, or edit it manually:
 
 ```
 bash +x replace-rag-param.sh <HOST_PATH>
 ```
 
-Example:
+Where `<HOST_PATH>` is the path to the **bussiness** directory of the LLM-Serving model, for example:
 
 ```
 bash +x replace-rag-param.sh /home/model
 ```
 
-Copy the updated file into the model directory:
+Copy the modified `Param-rag.yaml` to the **bussiness** directory of the RAG model:
 
 ```
 cp Param-rag.yaml <HOST_PATH>/bussiness/
@@ -338,13 +356,14 @@ cp Param-rag.yaml <HOST_PATH>/bussiness/
 
 #### 4.3.5 Deploy LLM-Serving
 
-After completing the configuration, deploy the service:
+After all modifications are complete, deploy the service:
 
 ```
 kubectl apply -f llm-serving.yml
 ```
 
 ### 5. Logging In
+
 Administrator use `admin` to login the system, if login is successful, you will see the OpenPAI homepage.
 Standard user need the administrator to create a new accout for the system, after creating successfully, you can login and use the system.
 
