@@ -3,34 +3,22 @@
 <p align="left">
    <a href="./README.md">🌐 中文</a> | 🌍 English  
 
-🎉 **OpenPAI**  is a lightweight large-model application development platform that can be quickly deployed. It supports local, enterprise server, and public cloud model services, aiming to help users interact with LLMs via a visual web interface and rapidly build LLM-based applications.
+🎉 **OpenPAI**  — the lightweight, easy-to-use yet powerful production-ready AI Agent platform. Access large models and build Agent workflows without complex stacks; develop AI Agent apps efficiently via visual interface. Support flexible integration of local, enterprise & cloud models, drastically cutting development barriers and doubling implementation efficiency.
+
 
 ---
 
 ## Key Highlights
 
-### 📺 **Custom Configuration**
-- 💻 **title**: Web browser title
-- 🏢 **logo**: specify logo
-- ☁️ **background**: specify background
+✅ Seamless LLM Integration: One-click access to both local and global large language models (LLMs), offering flexible, non-vendor-locked deployment that balances data compliance with the freedom to choose the best-fit model.
 
-### 🚀 **Seamless Model Integration**
-- **Local Deployment**: Easily connect to local models for on-premise usage.
-- **Enterprise Servers**: Integrate with models deployed on internal corporate servers.
-- **Public Cloud Services**: Connect to external cloud-based model services (e.g., OpenStation, 3rd-party providers).
+✅ Visual Agent Development: Build, debug, and deploy AI agents through an intuitive drag-and-drop interface. Supports both low-code and no-code modes—no complex tech stack or coding expertise required.
 
-### 🏗 **Rapid Setup & Deployment**
-- **Quick Installation**: Get started with minimal configuration.
-- **Visual Web Interface**: Interact with large models via a friendly UI.
-- **Scalable Architecture**: Supports integration of multiple model providers.
+✅ Production-Ready Capabilities: Features built-in, precision-tuned RAG tightly integrated with enterprise knowledge bases to ensure accurate, compliant responses. Covers the full lifecycle—from development and testing to deployment and operations—enabling stable, production-grade performance and scalable rollout of core business applications.
 
-### 🎯 **Multiple Roles**
-- **Administrator**: Access advanced settings, manage users, model connections, agents, resourcesand datas.
-- **Standard User**: Engage in LLM conversations, adjust user preferences, and manage personal agents and datas.
+✅ Secure & Controllable: Natively supports on-premises/private deployment and includes content security review for all inputs and outputs. Comes standard with enterprise-grade LLMOps for end-to-end monitoring and evaluation, meeting stringent compliance requirements in regulated industries—with robust safeguards for both security and compliance.
 
-### 🛠️**manage agents, datas**
-- 🔧manage agents, eval-tasks, prompts
-- 🖥️manage datas, including knowledge-bases, databases, profession lexicons
+✅ Flexible Customization: Fully configurable interface allowing custom titles, logos, and background themes to match your brand and user experience needs.
 
 ---
 
@@ -367,19 +355,53 @@ Standard user need the administrator to create a new accout for the system, afte
 
 ## 🎉 Features & Roles
 
-### Administrator
-- **Model**: model server, can add model servers, and model services belongs these server.
-- **Resource**: system provides to manage mcp serices.
-- **Applications**:  system provides to manage agents, prompts and app eval tasks
-- **Operational Trace**: system will save the user's operational trace for analysis 
-- **Settings**: system manage settings of many business.
-- **Users**: add users, delete users, reset password.
-
-### Standard User
-- **LLM Conversations**: Chat with integrated large models.
-- **Application Manage**: manage agents, prompt, eval tasks
-- **Data Manage**: manage datas like kowledge-bases, databases, professional lexicon
-- **Preference Manage**: Update personal preference
+<table>
+  <tr>
+    <td align="left" width="15%">Role</td>
+    <td align="left" width="20%">Role Position</td>
+    <td align="left" width="60%">Functions</td>
+  </tr>
+  <tr>
+    <td align="left" rowspan="6">System Administrator</td>
+    <td align="left" rowspan="6">Platform-wide controller. Manages model service providers and data introduced to the platform; responsible for system stability, security, resource allocation, and permission management.</td>
+    <td align="left">1. User Management: Create/delete users, assign role permissions, reset passwords, disable accounts;</td>
+  </tr>
+  <tr>
+    <td align="left">2. Model Management: Onboard model service providers, manage model services, and configure inference parameters;</td>
+  </tr>
+  <tr>
+    <td align="left">3. Agent Approval: Approve agent launch, allocate computing/storage resources;</td>
+  </tr>
+  <tr>
+    <td align="left">4. Data Management: Manage knowledge bases and databases across the platform;</td>
+  </tr>
+  <tr>
+    <td align="left">5. System Configuration: Configure platform parameters, manage MCP/plugin marketplace;</td>
+  </tr>
+  <tr>
+    <td align="left">6. O&M Monitoring: View system logs, monitor service status.</td>
+  </tr>
+  <tr>
+    <td align="left" rowspan="6">Regular User</td>
+    <td align="left" rowspan="6">Agent developer and user. Focuses on the full-lifecycle management of agents, handling development, testing, deployment, and O&M.</td>
+    <td align="left">1. Agent Creation: Create agents via template/custom configuration, set basic info (name/description);</td>
+  </tr>
+  <tr>
+    <td align="left">2. Development & Debugging: Design prompts, orchestrate workflows, call tools/APIs, conduct single/multi-turn tests;</td>
+  </tr>
+  <tr>
+    <td align="left">3. Testing & Validation: Initiate performance/functional tests, view test reports, optimize agent logic;</td>
+  </tr>
+  <tr>
+    <td align="left">4. Deployment & Release: Select deployment environments, release agents, manage version iterations;</td>
+  </tr>
+  <tr>
+    <td align="left">5. O&M Management: Monitor agent operation status, view call logs, troubleshoot operational faults;</td>
+  </tr>
+  <tr>
+    <td align="left">6. Data Management: Create knowledge bases/databases, set basic info and configuration parameters.</td>
+  </tr>
+</table>
 
 ---
 
